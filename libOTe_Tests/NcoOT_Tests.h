@@ -1,5 +1,5 @@
 #pragma once
-// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use. 
+// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use.
 
 
 namespace tests_libOTe
@@ -13,4 +13,6 @@ namespace tests_libOTe
     void Tools_LinearCode_Test();
     void Tools_LinearCode_sub_Test();
     void Tools_LinearCode_rep_Test();
+
+    void Wedpr_kkrt_ot_local_test();
 }

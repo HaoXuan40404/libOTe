@@ -1,12 +1,11 @@
 #include "OTExtInterface.h"
 #include "libOTe/Base/BaseOT.h"
 #include <cryptoTools/Common/BitVector.h>
-#include <vector>
 #include <cryptoTools/Network/Channel.h>
+#include <vector>
 
-void osuCrypto::OtExtReceiver::genBaseOts(PRNG & prng, Channel & chl)
+void osuCrypto::OtExtReceiver::genBaseOts(PRNG& prng, Channel& chl)
 {
-
 #ifdef LIBOTE_HAS_BASE_OT
     DefaultBaseOT base;
     auto count = baseOtCount();
@@ -15,11 +14,12 @@ void osuCrypto::OtExtReceiver::genBaseOts(PRNG & prng, Channel & chl)
 
     setBaseOts(msgs, prng, chl);
 #else
-    throw std::runtime_error("The libOTe library does not have base OTs. Enable them to call this. " LOCATION);
+    throw std::runtime_error(
+        "The libOTe library does not have base OTs. Enable them to call this. " LOCATION);
 #endif
 }
 
-void osuCrypto::OtExtSender::genBaseOts(PRNG & prng, Channel & chl)
+void osuCrypto::OtExtSender::genBaseOts(PRNG& prng, Channel& chl)
 {
 #ifdef LIBOTE_HAS_BASE_OT
     DefaultBaseOT base;
@@ -31,19 +31,16 @@ void osuCrypto::OtExtSender::genBaseOts(PRNG & prng, Channel & chl)
     base.receive(bv, msgs, prng, chl);
     setBaseOts(msgs, bv, chl);
 #else
-    throw std::runtime_error("The libOTe library does not have base OTs. Enable them to call this. " LOCATION);
+    throw std::runtime_error(
+        "The libOTe library does not have base OTs. Enable them to call this. " LOCATION);
 #endif
-
 }
 
 void osuCrypto::OtReceiver::receiveChosen(
-    const BitVector & choices, 
-    span<block> recvMessages,
-    PRNG & prng, 
-    Channel & chl)
+    const BitVector& choices, span<block> recvMessages, PRNG& prng, Channel& chl)
 {
     receive(choices, recvMessages, prng, chl);
-    std::vector<std::array<block,2>> temp(recvMessages.size());
+    std::vector<std::array<block, 2>> temp(recvMessages.size());
     chl.recv(temp.data(), temp.size());
     auto iter = choices.begin();
     for (u64 i = 0; i < temp.size(); ++i)
@@ -53,25 +50,22 @@ void osuCrypto::OtReceiver::receiveChosen(
     }
 }
 
-void osuCrypto::OtReceiver::receiveCorrelated(const BitVector& choices, span<block> recvMessages, PRNG& prng, Channel& chl)
+void osuCrypto::OtReceiver::receiveCorrelated(
+    const BitVector& choices, span<block> recvMessages, PRNG& prng, Channel& chl)
 {
     receive(choices, recvMessages, prng, chl);
     std::vector<block> temp(recvMessages.size());
     chl.recv(temp.data(), temp.size());
     auto iter = choices.begin();
-    
+
     for (u64 i = 0; i < temp.size(); ++i)
     {
         recvMessages[i] = recvMessages[i] ^ (zeroAndAllOne[*iter] & temp[i]);
         ++iter;
     }
-
 }
 
-void osuCrypto::OtSender::sendChosen(
-    span<std::array<block, 2>> messages, 
-    PRNG & prng, 
-    Channel & chl)
+void osuCrypto::OtSender::sendChosen(span<std::array<block, 2>> messages, PRNG& prng, Channel& chl)
 {
     std::vector<std::array<block, 2>> temp(messages.size());
     send(temp, prng, chl);

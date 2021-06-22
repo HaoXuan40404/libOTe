@@ -22,8 +22,11 @@ along with BitPolyMul.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef ENABLE_SILENTOT
 
 
-namespace bpm {
-     inline
-        unsigned get_s_k_a_cantor(unsigned k, unsigned a) { return (a >> k); }
+namespace bpm
+{
+inline unsigned get_s_k_a_cantor(unsigned k, unsigned a)
+{
+    return (a >> k);
 }
+}  // namespace bpm
 #endif

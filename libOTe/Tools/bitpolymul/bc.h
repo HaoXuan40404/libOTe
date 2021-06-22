@@ -22,25 +22,24 @@ along with BitPolyMul.  If not, see <http://www.gnu.org/licenses/>.
 #include "libOTe/config.h"
 #ifdef ENABLE_SILENTOT
 
-#include <stdint.h>
 #include "bpmDefines.h"
+#include <stdint.h>
 
-namespace bpm {
+namespace bpm
+{
+typedef uint64_t bc_sto_t;
+void bc_to_lch_256_30_12(__m256i* poly, int logn);
+void bc_to_lch_256_19_17(__m256i* poly, int logn);
+void bc_to_lch_256_16(__m256i* poly, int logn);
+void bc_to_mono_256_16(__m256i* poly, int logn);
+void bc_to_mono_256_19_17(__m256i* poly, int logn);
+void bc_to_mono_256_30_20(__m256i* poly, int logn);
 
+void bc_to_lch_2_unit256(bc_sto_t* poly, u64 n_terms);
 
-    typedef uint64_t bc_sto_t;
-    void bc_to_lch_256_30_12(__m256i* poly, int logn);
-    void bc_to_lch_256_19_17(__m256i* poly, int logn);
-    void bc_to_lch_256_16(__m256i* poly, int logn);
-    void bc_to_mono_256_16(__m256i* poly, int logn);
-    void bc_to_mono_256_19_17(__m256i* poly, int logn);
-    void bc_to_mono_256_30_20(__m256i* poly, int logn);
+void bc_to_mono_2_unit256(bc_sto_t* poly, u64 n_terms);
 
-    void bc_to_lch_2_unit256(bc_sto_t* poly, u64 n_terms);
-
-    void bc_to_mono_2_unit256(bc_sto_t* poly, u64 n_terms);
-
-}
+}  // namespace bpm
 
 
 #endif

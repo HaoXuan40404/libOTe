@@ -462,30 +462,30 @@ namespace tests_libOTe
         PRNG prng0(ZeroBlock);
         choices.randomize(prng0);
         baseChoice.randomize(prng0);
-		
+
         for (u64 i = 0; i < 128; ++i)
         {
             baseSend[i][0] = prng0.get<block>();
             baseSend[i][1] = prng0.get<block>();
             baseRecv[i] = baseSend[i][baseChoice[i]];
         }
-		
+
         prng0.get(sendMsg.data(), sendMsg.size());
 
         KosOtExtSender sender;
         KosOtExtReceiver recv;
 
-        auto thrd = std::thread([&]() { 
-            PRNG prng1(OneBlock); 
+        auto thrd = std::thread([&]() {
+            PRNG prng1(OneBlock);
             recv.setBaseOts(baseSend, prng1, recvChannel);
-            recv.receiveChosen(choices, recvMsg, prng1, recvChannel); 
+            recv.receiveChosen(choices, recvMsg, prng1, recvChannel);
         });
 
         sender.setBaseOts(baseRecv, baseChoice, senderChannel);
         sender.sendChosen(sendMsg, prng0, senderChannel);
 
         thrd.join();
-		
+
         for (u64 i = 0; i < numOTs; ++i)
         {
             if (neq(recvMsg[i], sendMsg[i][choices[i]]))
@@ -670,15 +670,30 @@ namespace tests_libOTe
 		BitVector choices(numOTs), baseChoice(128);
 		choices.randomize(prng0);
 		baseChoice.randomize(prng0);
+		// for(auto block_ts: baseRecv) {
+			// std::cout<<" baseChoice = "<<baseChoice<<std::endl;
+			// std::cout<<" BitVector = "<<choices<<std::endl;
+		// }
+
 
 		prng0.get((u8*)baseSend.data()->data(), sizeof(block) * 2 * baseSend.size());
 		for (u64 i = 0; i < 128; ++i)
 		{
 			baseRecv[i] = baseSend[i][baseChoice[i]];
 		}
-
 		IknpOtExtSender sender;
 		IknpOtExtReceiver recv;
+
+
+		// for(auto block_ts: baseRecv) {
+		// 	std::cout<<"baseRecv block_ts = "<<block_ts<<std::endl;
+		// }
+		// for(auto block_ts: baseSend) {
+		// 		std::cout<<"******baseSend block_ts ="<<std::endl;
+		// 	for(auto array_s: block_ts) {
+		// 		std::cout<<"baseSend array_s = "<<array_s<<std::endl;
+		// 	}
+		// }
 
 		std::thread thrd = std::thread([&]() {
 			recv.setBaseOts(baseSend);
@@ -688,7 +703,20 @@ namespace tests_libOTe
 		sender.setBaseOts(baseRecv, baseChoice);
 		sender.send(sendMsg, prng1, senderChannel);
 		thrd.join();
-
+		// for() {
+			// std::cout<<sendMsg<<std::endl;
+			// std::cout<<"choices = "<<choices<<std::endl;
+			// std::cout<<recvMsg<<std::endl;
+		// }
+		// for(auto block_ts: recvMsg) {
+		// 	std::cout<<"End recvMsg block_ts = "<<block_ts<<std::endl;
+		// }
+		// for(auto block_ts: sendMsg) {
+		// 		std::cout<<"End ******sendMsg block_ts ="<<std::endl;
+		// 	for(auto array_s: block_ts) {
+		// 		std::cout<<"End sendMsg array_s = "<<array_s<<std::endl;
+		// 	}
+		// }
 		OT_100Receive_Test(choices, recvMsg, sendMsg);
 
 #else

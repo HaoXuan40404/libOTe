@@ -3,6 +3,6 @@
 
 #include "polyvec.h"
 
-void genmatrix(polyvec *a, const unsigned char *seed, int transposed);
+void genmatrix(polyvec* a, const unsigned char* seed, int transposed);
 
 #endif

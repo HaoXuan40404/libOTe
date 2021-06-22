@@ -9,6 +9,8 @@
 #include "libOTe/TwoChooseOne/KosOtExtSender.h"
 #include "Common.h"
 #include <cryptoTools/Common/TestCollection.h>
+#include <iostream>
+#include <iterator>
 using namespace osuCrypto;
 #include "libOTe/Base/BaseOT.h"
 
@@ -29,12 +31,14 @@ namespace tests_libOTe
         u64 cncThreshold(724);
         double cncProb(0.0999);
 
-        //u64 totalOts  (10);
-        //u64 minOnes    (0);
-        //u64 avgOnes    (5);
-        //u64 maxOnes    (999999999);
-        //u64 cncThreshold(9999999);
-        //double cncProb (0.1);
+        // u64 totalOts  (10);
+        // u64 minOnes    (0);
+        // u64 avgOnes    (5);
+        // u64 maxOnes(9363);
+        // u64 cncThreshold(724);
+        // u64 maxOnes    (999999999);
+        // u64 cncThreshold(9999999);
+        // double cncProb (0.1);
 
 
         setThreadName("Recvr");
@@ -94,6 +98,9 @@ namespace tests_libOTe
         {
             if (neq(send.mMessages[i][recv.mChoices[i]], recv.mMessages[i]))
                 throw UnitTestFail();
+            // else {
+            //     std::cout<<"recv.mMessages[i]="<<recv.mMessages[i]<<std::endl;
+            // }
         }
 
         if (recv.mOnes.size() < minOnes)

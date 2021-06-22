@@ -18,6 +18,8 @@
 #include "libOTe/NChooseOne/RR17/Rr17NcoOtSender.h"
 
 #include "Common.h"
+#include <iostream>
+#include <ostream>
 #include <thread>
 #include <vector>
 #include "NcoOT_Tests.h"
@@ -104,8 +106,8 @@ namespace tests_libOTe
                 for (u64 k = 0; k < curStepSize; ++k)
                 {
 
-                    // The receiver MUST encode before the sender. Here we are only calling encode(...) 
-                    // for a single i. But the receiver can also encode many i, but should only make one 
+                    // The receiver MUST encode before the sender. Here we are only calling encode(...)
+                    // for a single i. But the receiver can also encode many i, but should only make one
                     // call to encode for any given value of i.
                     if (skips[k])
                     {
@@ -128,7 +130,7 @@ namespace tests_libOTe
 
                 for (u64 k = 0; k < curStepSize; ++k)
                 {
-                    // the sender can now call encode(i, ...) for k \in {0, ..., i}. 
+                    // the sender can now call encode(i, ...) for k \in {0, ..., i}.
                     // Lets encode the same input and then we should expect to
                     // get the same encoding.
                     sender.encode(i + k, &inputs[k], (u8*)&encoding2[k], sizeof(block));
@@ -138,7 +140,7 @@ namespace tests_libOTe
                         throw UnitTestFail("ot[" + std::to_string(i+k) + "] not equal " LOCATION);
 
                     // In addition to the sender being able to obtain the same value as the receiver,
-                    // the sender can encode and other codeword. This should result in a different 
+                    // the sender can encode and other codeword. This should result in a different
                     // encoding.
                     inputs[k] = prng0.get<block>();
 
@@ -156,25 +158,41 @@ namespace tests_libOTe
     {
 #ifdef ENABLE_KKRT
         setThreadName("Sender");
-        
-        PRNG prng0(block(4253465, 3434565));
-        PRNG prng1(block(42532335, 334565));
+
+        // PRNG prng0(block(4253465, 3434565));
+        // PRNG prng1(block(42532335, 334565));
+        PRNG prng0(sysRandomSeed());
+        PRNG prng1(sysRandomSeed());
+
+        std::cout<<prng0.get_block()<<std::endl;
+        std::cout<<prng1.get_block()<<std::endl;
+        // 8d8d42bc7c02cd226bdc99f3e6cc914c
+        // 5e2f6ccdee2d41d5e8e92bdde9e3b312
+
 
         // The total number that we wish to do
         u64 numOTs = 1030;
 
         KkrtNcoOtSender sender;
         KkrtNcoOtReceiver recv;
+        std::cout<<sender.mGens.data()<<std::endl;
+        std::cout<<recv.mGens.data()<<std::endl;
 
-        // get up the parameters and get some information back. 
+        // get up the parameters and get some information back.
         //  1) false = semi-honest
         //  2) 40  =  statistical security param.
         //  3) numOTs = number of OTs that we will perform
         sender.configure(false, 40, 128);
         recv.configure(false, 40, 128);
+        // sender.mGens.resize(4*128);
+        // recv.mGens.resize(4*128);
+        std::cout<<sender.mGens.data()<<std::endl;
+        std::cout<<recv.mGens.data()<<std::endl;
+
 
         // the number of base OT that need to be done
         u64 baseCount = sender.getBaseOTCount();
+        std::cout<<baseCount<<std::endl;
 
         // Fake some base OTs
         std::vector<block> baseRecv(baseCount);
@@ -221,8 +239,8 @@ namespace tests_libOTe
                 for (u64 k = 0; k < stepSize; ++k)
                 {
 
-                    // The receiver MUST encode before the sender. Here we are only calling encode(...) 
-                    // for a single i. But the receiver can also encode many i, but should only make one 
+                    // The receiver MUST encode before the sender. Here we are only calling encode(...)
+                    // for a single i. But the receiver can also encode many i, but should only make one
                     // call to encode for any given value of i.
                     recv.encode(i + k, &inputs[k], (u8*)&encoding1[k], sizeof(block));
                 }
@@ -239,7 +257,7 @@ namespace tests_libOTe
 
                 for (u64 k = 0; k < stepSize; ++k)
                 {
-                    // the sender can now call encode(i, ...) for k \in {0, ..., i}. 
+                    // the sender can now call encode(i, ...) for k \in {0, ..., i}.
                     // Lets encode the same input and then we should expect to
                     // get the same encoding.
                     sender.encode(i + k, &inputs[k], (u8*)&encoding2[k], sizeof(block));
@@ -249,7 +267,7 @@ namespace tests_libOTe
                         throw UnitTestFail(LOCATION);
 
                     // In addition to the sender being able to obtain the same value as the receiver,
-                    // the sender can encode and other codeword. This should result in a different 
+                    // the sender can encode and other codeword. This should result in a different
                     // encoding.
                     inputs[k] = prng0.get<block>();
 
@@ -260,6 +278,7 @@ namespace tests_libOTe
                 }
             }
         }
+
 
         // Double check that we can call split and perform the same tests.
         auto recv2Ptr = recv.split();
@@ -356,8 +375,8 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
 
         testNco(sender, numOTs, prng0, sendChl, recv, prng1, recvChl);
 
-        auto v = std::async([&] { 
-            recv.check(recvChl, toBlock(322334)); 
+        auto v = std::async([&] {
+            recv.check(recvChl, toBlock(322334));
         });
 
         try {
@@ -726,6 +745,11 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
             if (dest[i] != 1)
                 throw UnitTestFail(LOCATION);
         }
+    }
+
+    void Wedpr_kkrt_ot_local_test()
+    {
+        std::cout<<"Wedpr_kkrt_ot_local_test"<<std::endl;
     }
 
 }

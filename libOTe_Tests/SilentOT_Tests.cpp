@@ -1,12 +1,12 @@
 #include "SilentOT_Tests.h"
 
 #include "libOTe/Tools/SilentPprf.h"
-#include "libOTe/TwoChooseOne/SilentOtExtSender.h"
 #include "libOTe/TwoChooseOne/SilentOtExtReceiver.h"
-#include <cryptoTools/Common/Log.h>
+#include "libOTe/TwoChooseOne/SilentOtExtSender.h"
 #include <cryptoTools/Common/BitVector.h>
-#include <cryptoTools/Network/IOService.h>
+#include <cryptoTools/Common/Log.h>
 #include <cryptoTools/Common/TestCollection.h>
+#include <cryptoTools/Network/IOService.h>
 
 using namespace oc;
 
@@ -14,8 +14,8 @@ using namespace oc;
 void Tools_bitShift_test(const CLP& cmd)
 {
 #ifdef ENABLE_SILENTOT
-    //u64 nBits = ;
-    u64 n = cmd.getOr("n", 10);// (nBits + 127) / 128;
+    // u64 nBits = ;
+    u64 n = cmd.getOr("n", 10);  // (nBits + 127) / 128;
     u64 t = cmd.getOr("t", 10);
 
     PRNG prng(toBlock(cmd.getOr("seed", 0)));
@@ -24,9 +24,8 @@ void Tools_bitShift_test(const CLP& cmd)
     prng.get(dest.data(), dest.size());
 
 
-
-    //std::cout << "a " << (_mm_slli_epi64(AllOneBlock, 20)) << std::endl;
-    //std::cout << "b " << (_mm_srli_epi64(AllOneBlock, 20)) << std::endl;
+    // std::cout << "a " << (_mm_slli_epi64(AllOneBlock, 20)) << std::endl;
+    // std::cout << "b " << (_mm_srli_epi64(AllOneBlock, 20)) << std::endl;
 
     for (u64 i = 0; i < t; ++i)
     {
@@ -69,7 +68,6 @@ void Tools_bitShift_test(const CLP& cmd)
             std::cout << "    " << (dv2 ^ dv) << std::endl;
             throw RTE_LOC;
         }
-
     }
 #else
     throw UnitTestSkipped("ENABLE_SILENTOT not defined.");
@@ -113,7 +111,7 @@ void Tools_modp_test(const CLP& cmd)
 
     for (u64 i = 0; i < dest.size(); ++i)
     {
-        u64 p = nBits;// -(prng.get<u64>() % 128);
+        u64 p = nBits;  // -(prng.get<u64>() % 128);
 
         prng.get(in.data(), in.size());
         memset(in.data(), -1, in.size() * 16);
@@ -124,7 +122,7 @@ void Tools_modp_test(const CLP& cmd)
         BitVector dv((u8*)in.data(), p);
         BitVector iv;
 
-        //std::cout << "\nin[0] = " << dv << std::endl;
+        // std::cout << "\nin[0] = " << dv << std::endl;
 
         for (u64 j = 1; j < c; ++j)
         {
@@ -132,13 +130,12 @@ void Tools_modp_test(const CLP& cmd)
             iv.resize(0);
             iv.append((u8*)in.data(), rem, j * p);
 
-            //std::cout << "in["<<j<<"] = " << iv << std::endl;
+            // std::cout << "in["<<j<<"] = " << iv << std::endl;
 
             iv.resize(p, 0);
             dv ^= iv;
         }
-        //std::cout << "out   = " << dv << std::endl;
-
+        // std::cout << "out   = " << dv << std::endl;
 
 
         modp(dest, in, p);
@@ -148,10 +145,10 @@ void Tools_modp_test(const CLP& cmd)
 
         if (dv != dv2)
         {
-            //auto b = (bitShift > 64) ? 128 - bitShift : 64 - bitShift;
+            // auto b = (bitShift > 64) ? 128 - bitShift : 64 - bitShift;
             auto diff = (dv2 ^ dv);
             std::cout << "\n" << p << "\n";
-            //std::cout << "   "
+            // std::cout << "   "
             //    << std::string(b, ' ')
             //    << std::string(bitShift, 'x') << '\n';
             std::cout << "act     " << dv2 << std::endl;
@@ -166,8 +163,7 @@ void Tools_modp_test(const CLP& cmd)
             throw RTE_LOC;
         }
 
-        //std::cout << dv2 << std::endl;
-
+        // std::cout << dv2 << std::endl;
     }
 
 #else
@@ -184,13 +180,12 @@ void OtExt_Silent_Test(const CLP& cmd)
     Session s1(ios, "localhost:1212", SessionMode::Client);
 
 
-
     u64 n = cmd.getOr("n", 10000);
     bool verbose = cmd.getOr("v", 0) > 1;
     u64 threads = cmd.getOr("t", 4);
     u64 s = cmd.getOr("s", 4);
     u64 sec = cmd.getOr("sec", 80);
-    //bool mal = cmd.isSet("mal");
+    // bool mal = cmd.isSet("mal");
 
     std::vector<Channel> chls0(threads), chls1(threads);
 
@@ -211,9 +206,9 @@ void OtExt_Silent_Test(const CLP& cmd)
     sender.setTimer(timer);
     recver.setTimer(timer);
 
-    //sender.mDebug = true;
-    //recver.mDebug = true;
-    //recver.mGen.mPrint = false;
+    // sender.mDebug = true;
+    // recver.mDebug = true;
+    // recver.mGen.mPrint = false;
 
     // fake base OTs.
     {
@@ -232,8 +227,8 @@ void OtExt_Silent_Test(const CLP& cmd)
         PRNG prngz(ZeroBlock);
         for (u64 i = 0; i < msg.size(); ++i)
         {
-        	msg[i][0] = toBlock(i, 0);
-        	msg[i][1] = toBlock(i, 1); 
+            msg[i][0] = toBlock(i, 0);
+            msg[i][1] = toBlock(i, 1);
         }
         sender.setSlientBaseOts(msg);
     }
@@ -250,7 +245,7 @@ void OtExt_Silent_Test(const CLP& cmd)
     choice.resize(n);
     for (u64 i = 0; i < n; ++i)
     {
-        std::array<bool, 2> eqq{ eq(messages2[i], messages[i][0]),eq(messages2[i], messages[i][1]) };
+        std::array<bool, 2> eqq{eq(messages2[i], messages[i][0]), eq(messages2[i], messages[i][1])};
         if (eqq[choice[i]] == false || eqq[choice[i] ^ 1] == true)
         {
             passed = false;
@@ -265,7 +260,9 @@ void OtExt_Silent_Test(const CLP& cmd)
         }
 
         if (verbose)
-            std::cout << i << " " << messages2[i] << " " << messages[i][0] << " " << messages[i][1] << " " << int(choice[i]) << std::endl << Color::Default;
+            std::cout << i << " " << messages2[i] << " " << messages[i][0] << " " << messages[i][1]
+                      << " " << int(choice[i]) << std::endl
+                      << Color::Default;
 
         if (eq(messages2[i], messages[i][1]))
             act[i] = 1;
@@ -282,7 +279,7 @@ void OtExt_Silent_Test(const CLP& cmd)
 
     if (passed == false)
         throw RTE_LOC;
-    
+
 
 #else
     throw UnitTestSkipped("ENABLE_SILENTOT not defined.");
@@ -290,12 +287,12 @@ void OtExt_Silent_Test(const CLP& cmd)
 }
 
 
-
 void Tools_Pprf_test(const CLP& cmd)
 {
 #ifdef ENABLE_SILENTOT
 
-    u64 depth = cmd.getOr("d", 3);;
+    u64 depth = cmd.getOr("d", 3);
+    ;
     u64 domain = 1ull << depth;
     auto threads = cmd.getOr("t", 3ull);
     u64 numPoints = cmd.getOr("s", 8);
@@ -327,13 +324,13 @@ void Tools_Pprf_test(const CLP& cmd)
     std::vector<block> recvOTs(numOTs);
     BitVector recvBits = recver.sampleChoiceBits(domain, false, prng);
 
-    //prng.get(sendOTs.data(), sendOTs.size());
-    //sendOTs[cmd.getOr("i",0)] = prng.get();
+    // prng.get(sendOTs.data(), sendOTs.size());
+    // sendOTs[cmd.getOr("i",0)] = prng.get();
 
-    //recvBits[16] = 1;
+    // recvBits[16] = 1;
     for (u64 i = 0; i < numOTs; ++i)
     {
-        //recvBits[i] = 0;
+        // recvBits[i] = 0;
         recvOTs[i] = sendOTs[i][recvBits[i]];
     }
     sender.setBase(sendOTs);
@@ -351,10 +348,8 @@ void Tools_Pprf_test(const CLP& cmd)
 
     for (u64 j = 0; j < numPoints; ++j)
     {
-
         for (u64 i = 0; i < domain; ++i)
         {
-
             auto exp = sOut(i, j);
             if (points[j] == i)
                 exp = exp ^ CCBlock;
@@ -367,7 +362,8 @@ void Tools_Pprf_test(const CLP& cmd)
                     std::cout << Color::Red;
             }
             if (cmd.isSet("v"))
-                std::cout << "r[" << j << "][" << i << "] " << exp << " " << rOut(i, j) << std::endl << Color::Default;
+                std::cout << "r[" << j << "][" << i << "] " << exp << " " << rOut(i, j) << std::endl
+                          << Color::Default;
         }
     }
 
@@ -383,9 +379,9 @@ void Tools_Pprf_trans_test(const CLP& cmd)
 {
 #ifdef ENABLE_SILENTOT
 
-    //u64 depth = 6;
-    //u64 domain = 13;// (1ull << depth) - 7;
-    //u64 numPoints = 40;
+    // u64 depth = 6;
+    // u64 domain = 13;// (1ull << depth) - 7;
+    // u64 numPoints = 40;
 
     u64 domain = cmd.getOr("d", 334);
     auto threads = cmd.getOr("t", 3ull);
@@ -406,8 +402,6 @@ void Tools_Pprf_trans_test(const CLP& cmd)
     }
 
 
-
-
     SilentMultiPprfSender sender;
     SilentMultiPprfReceiver recver;
 
@@ -418,12 +412,12 @@ void Tools_Pprf_trans_test(const CLP& cmd)
     std::vector<std::array<block, 2>> sendOTs(numOTs);
     std::vector<block> recvOTs(numOTs);
     BitVector recvBits = recver.sampleChoiceBits(domain * numPoints, true, prng);
-    //recvBits.randomize(prng);
+    // recvBits.randomize(prng);
 
-    //recvBits[16] = 1;
+    // recvBits[16] = 1;
     for (u64 i = 0; i < numOTs; ++i)
     {
-        //recvBits[i] = 0;
+        // recvBits[i] = 0;
         recvOTs[i] = sendOTs[i][recvBits[i]];
     }
     sender.setBase(sendOTs);
@@ -436,8 +430,6 @@ void Tools_Pprf_trans_test(const CLP& cmd)
     recver.getTransposedPoints(points);
 
 
-
-
     sender.expand(chls0, AllOneBlock, prng, sOut, true, mal);
     recver.expand(chls1, prng, rOut, true, mal);
     bool failed = false;
@@ -446,23 +438,23 @@ void Tools_Pprf_trans_test(const CLP& cmd)
     Matrix<block> outT(numPoints * domain, 1);
 
     if (cmd.getOr("v", 0) > 1)
-        std::cout << sender.mDomain << " " << sender.mPntCount <<
-        " " << sOut.rows() << " " << sOut.cols() << std::endl;
+        std::cout << sender.mDomain << " " << sender.mPntCount << " " << sOut.rows() << " "
+                  << sOut.cols() << std::endl;
 
     for (u64 i = 0; i < cols; ++i)
     {
         for (u64 j = 0; j < 128; ++j)
         {
             out(j, i) = (sOut(j, i) ^ rOut(j, i));
-            //if (cmd.isSet("v"))
-            //	std::cout << "r[" << i << "][" << j << "] " << out(j,i)  << " ~ " << rOut(j, i) << std::endl << Color::Default;
+            // if (cmd.isSet("v"))
+            //	std::cout << "r[" << i << "][" << j << "] " << out(j,i)  << " ~ " << rOut(j, i) <<
+            //std::endl << Color::Default;
         }
     }
     transpose(MatrixView<block>(out), MatrixView<block>(outT));
 
     for (u64 i = 0; i < outT.rows(); ++i)
     {
-
         auto f = std::find(points.begin(), points.end(), i) != points.end();
 
         auto exp = f ? AllOneBlock : ZeroBlock;

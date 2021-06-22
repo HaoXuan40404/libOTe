@@ -25,19 +25,17 @@ along with BitPolyMul.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "bpmDefines.h"
 
-namespace bpm {
+namespace bpm
+{
+void btfy_128(uint64_t* fx, u64 n_fx, u64 scalar_a);
 
-    void btfy_128(uint64_t* fx, u64 n_fx, u64 scalar_a);
-
-    void i_btfy_128(uint64_t* fx, u64 n_fx, u64 scalar_a);
-
-
-    void btfy_64(uint64_t* fx, u64 n_fx, u64 scalar_a);
-
-    void i_btfy_64(uint64_t* fx, u64 n_fx, u64 scalar_a);
-}
+void i_btfy_128(uint64_t* fx, u64 n_fx, u64 scalar_a);
 
 
+void btfy_64(uint64_t* fx, u64 n_fx, u64 scalar_a);
+
+void i_btfy_64(uint64_t* fx, u64 n_fx, u64 scalar_a);
+}  // namespace bpm
 
 
 #endif

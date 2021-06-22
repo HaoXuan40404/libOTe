@@ -28,20 +28,18 @@ along with BitPolyMul.  If not, see <http://www.gnu.org/licenses/>.
 #include "bpmDefines.h"
 
 
-namespace bpm {
+namespace bpm
+{
+void encode_128_half_input_zero(uint64_t* rfx, const uint64_t* fx, u64 n_fx_128b);
+
+void decode_128(uint64_t* rfx, const uint64_t* fx, u64 n_fx_128b);
+
+void encode_64_half_input_zero(uint64_t* rfx, const uint64_t* fx, u64 n_fx);
+
+void decode_64(uint64_t* rfx, const uint64_t* fx, u64 n_fx);
 
 
-    void encode_128_half_input_zero(uint64_t* rfx, const uint64_t* fx, u64 n_fx_128b);
-
-    void decode_128(uint64_t* rfx, const uint64_t* fx, u64 n_fx_128b);
-
-    void encode_64_half_input_zero(uint64_t* rfx, const uint64_t* fx, u64 n_fx);
-
-    void decode_64(uint64_t* rfx, const uint64_t* fx, u64 n_fx);
-
-
-}
-
+}  // namespace bpm
 
 
 #endif

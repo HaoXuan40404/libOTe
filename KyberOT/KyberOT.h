@@ -1,14 +1,14 @@
 #include "params.h"
 
-//length in bytes/unsigned chars
+// length in bytes/unsigned chars
 #define PKlength (KYBER_POLYVECBYTES + KYBER_SYMBYTES)
 #define PKlengthsmall KYBER_POLYVECBYTES
 #define SKlength KYBER_INDCPA_SECRETKEYBYTES
-#define CTlength (KYBER_POLYVECBYTES+KYBER_POLYBYTES)
+#define CTlength (KYBER_POLYVECBYTES + KYBER_POLYBYTES)
 #define OTlength KYBER_INDCPA_MSGBYTES
 #define Coinslength (32)
 
-typedef struct 
+typedef struct
 {
     // sender message
     unsigned char sm[2][CTlength];
@@ -23,17 +23,15 @@ typedef struct
 } KyberOTPtxt;
 
 
-//receiver message 1 in the Kyber OT protocol.
-typedef struct 
+// receiver message 1 in the Kyber OT protocol.
+typedef struct
 {
-    //receiver message
+    // receiver message
     unsigned char keys[2][PKlength];
 } KyberOtRecvPKs;
 
-typedef struct 
+typedef struct
 {
-
-
     // receiver secret randomness
     unsigned char secretKey[SKlength];
 
