@@ -216,5 +216,64 @@ void AsmSimplestOT::send(span<std::array<block, 2>> msg, PRNG& prng, Channel& ch
         }
     }
 }
+
+void AsmSimplestOT::sendSPack(SENDER sender, span<std::array<block, 2>> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES])
+{
+    auto rand = makeRandSource(prng);
+    sender_genS(&sender, S_pack, rand);
+}
+
+void AsmSimplestOT::sendMessage(SENDER sender, span<std::array<block, 2>> msg, u8* RS_pack_result)
+{
+    u8 Rs_pack[4 * SIMPLEST_OT_PACK_BYTES];
+    u8 keys[2][4][SIMPLEST_OT_HASHBYTES];
+
+    for (u32 i = 0; i < msg.size(); i += 4)
+    {
+        memcpy(Rs_pack, RS_pack_result+i*sizeof(Rs_pack), sizeof(Rs_pack));
+        sender_keygen(&sender, Rs_pack, keys);
+
+        auto min = std::min<u32>(4, msg.size() - i);
+        for (u32 j = 0; j < min; j++)
+        {
+            memcpy(&msg[i + j][0], keys[0][j], sizeof(block));
+            memcpy(&msg[i + j][1], keys[1][j], sizeof(block));
+        }
+    }
+
+}
+
+void AsmSimplestOT::receiveSPack(RECEIVER receiver, const BitVector& choices, span<block> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result)
+{
+    u8 Rs_pack[4 * SIMPLEST_OT_PACK_BYTES];
+    u8 keys[4][SIMPLEST_OT_HASHBYTES];
+    u8 cs[4];
+
+    memcpy(receiver.S_pack, S_pack, SIMPLEST_OT_PACK_BYTES);
+
+    receiver_procS(&receiver);
+
+    receiver_maketable(&receiver);
+    auto rand = makeRandSource(prng);
+
+    for (u32 i = 0; i < msg.size(); i += 4)
+    {
+        // u8 Rs_pack[4 * SIMPLEST_OT_PACK_BYTES];
+        auto min = std::min<u32>(4, msg.size() - i);
+
+        for (u32 j = 0; j < min; j++)
+            cs[j] = choices[i + j];
+
+        receiver_rsgen(&receiver, Rs_pack, cs, rand);
+        // RS_pack_result[i] = Rs_pack;
+        memcpy(RS_pack_result+i*sizeof(Rs_pack), Rs_pack, sizeof(Rs_pack));
+        // RS_pack_result.push_back(Rs_pack);
+        receiver_keygen(&receiver, keys);
+
+        for (u32 j = 0; j < min; j++)
+            memcpy(&msg[i + j], keys[j], sizeof(block));
+    }
+}
+
 }  // namespace osuCrypto
 #endif

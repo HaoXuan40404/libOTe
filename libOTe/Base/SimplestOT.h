@@ -6,12 +6,19 @@
 //#define ENABLE_SIMPLESTOT
 //#endif
 
+// #include "SimplestOT/ot_receiver.h"
+// #include "SimplestOT/ot_sender.h"
 #include "libOTe/config.h"
 
 
 #include "libOTe/TwoChooseOne/OTExtInterface.h"
 #include <cryptoTools/Common/Defines.h>
 #include <cryptoTools/Crypto/PRNG.h>
+
+extern "C" {
+#include "../SimplestOT/ot_receiver.h"
+#include "../SimplestOT/ot_sender.h"
+}
 
 namespace osuCrypto
 {
@@ -76,6 +83,13 @@ public:
     void receive(const BitVector& choices, span<block> messages, PRNG& prng, Channel& chl) override;
 
     void send(span<std::array<block, 2>> messages, PRNG& prng, Channel& chl) override;
+
+    // SIMPLEST_OT_PACK_BYTES = 32
+    void sendSPack(SENDER sender, span<std::array<block, 2>> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES]);
+
+    void receiveSPack(RECEIVER receiver, const BitVector& choices, span<block> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result);
+
+    void sendMessage(SENDER sender, span<std::array<block, 2>> msg, u8* RS_pack_result);
 };
 
 #endif

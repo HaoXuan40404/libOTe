@@ -184,6 +184,43 @@ template <typename NcoOtSender, typename NcoOtReceiver>
 void wedpr_NChooseOne_single_example(
     Role role, int totalOTs, int numThreads, std::string ip, std::string tag, CLP&)
 {
+    // auto numOTs = 10;
+    //     auto numChosenMsgs = 1000;
+    //     bool maliciousSecure = false;
+    //     u64 statSecParam = 40;
+    //     u64 inputBitCount = 76;  // the kkrt protocol default to 128 but oos can only do 76.
+
+    //     // sender setup baseOT
+    //     PRNG prngS(sysRandomSeed());
+    //     KkrtNcoOtSender sender;
+    //     sender.configure(maliciousSecure, statSecParam, inputBitCount);
+
+    //     // recver setup baseOT
+    //     PRNG prngR(sysRandomSeed());
+    //     KkrtNcoOtReceiver recver;
+    //     recver.configure(maliciousSecure, statSecParam, inputBitCount);
+
+    //     // sender genBaseOT
+    //     auto countS = sender.getBaseOTCount();
+    //     std::vector<block> msgsS(countS);
+    //     DefaultBaseOT baseS;
+    //     RECEIVER recverBaseS;
+    //     BitVector bv(countS);
+    //     bv.randomize(prngS);
+    //     // sender.genBaseOtsStep1(baseS, PRNG &prng, std::vector<std::array<block, 2>> &msgs)
+
+
+    //     // recver genBaseOT
+    //     auto countR = recver.getBaseOTCount();
+    //     std::vector<std::array<block, 2>> msgsR(countR);
+    //     DefaultBaseOT baseR;
+
+    //     SENDER senderBaseR;
+    //     u8 S_pack[SIMPLEST_OT_PACK_BYTES];
+    //     recver.genBaseOtsStep1(baseR, senderBaseR, msgsR, prngR, S_pack);
+
+    //     u8* RS_pack_result[SIMPLEST_OT_PACK_BYTES];
+    //     sender.genBaseOtsStep2(baseS, recverBaseS, bv, msgsS, prngS, S_pack, RS_pack_result);
     if (role == Role::Sender)
     {
         wedpr_NChooseOne_example_sender<KkrtNcoOtSender>(totalOTs, ip);

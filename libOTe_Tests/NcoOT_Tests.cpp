@@ -164,8 +164,8 @@ namespace tests_libOTe
         PRNG prng0(sysRandomSeed());
         PRNG prng1(sysRandomSeed());
 
-        std::cout<<prng0.get_block()<<std::endl;
-        std::cout<<prng1.get_block()<<std::endl;
+        // std::cout<<prng0.get_block()<<std::endl;
+        // std::cout<<prng1.get_block()<<std::endl;
         // 8d8d42bc7c02cd226bdc99f3e6cc914c
         // 5e2f6ccdee2d41d5e8e92bdde9e3b312
 
@@ -175,8 +175,8 @@ namespace tests_libOTe
 
         KkrtNcoOtSender sender;
         KkrtNcoOtReceiver recv;
-        std::cout<<sender.mGens.data()<<std::endl;
-        std::cout<<recv.mGens.data()<<std::endl;
+        // std::cout<<sender.mGens.data()<<std::endl;
+        // std::cout<<recv.mGens.data()<<std::endl;
 
         // get up the parameters and get some information back.
         //  1) false = semi-honest
@@ -186,13 +186,13 @@ namespace tests_libOTe
         recv.configure(false, 40, 128);
         // sender.mGens.resize(4*128);
         // recv.mGens.resize(4*128);
-        std::cout<<sender.mGens.data()<<std::endl;
-        std::cout<<recv.mGens.data()<<std::endl;
+        // std::cout<<sender.mGens.data()<<std::endl;
+        // std::cout<<recv.mGens.data()<<std::endl;
 
 
         // the number of base OT that need to be done
         u64 baseCount = sender.getBaseOTCount();
-        std::cout<<baseCount<<std::endl;
+        // std::cout<<baseCount<<std::endl;
 
         // Fake some base OTs
         std::vector<block> baseRecv(baseCount);
@@ -750,6 +750,67 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
     void Wedpr_kkrt_ot_local_test()
     {
         std::cout<<"Wedpr_kkrt_ot_local_test"<<std::endl;
-    }
+        // M times N choose 1
+        // numOTs M
+        // numChosenMsgs N
+        auto numOTs = 10;
+        auto numChosenMsgs = 1000;
+        bool maliciousSecure = false;
+        u64 statSecParam = 40;
+        u64 inputBitCount = 76;  // the kkrt protocol default to 128 but oos can only do 76.
 
+        // sender setup baseOT
+        PRNG prngS(sysRandomSeed());
+        KkrtNcoOtSender sender;
+        sender.configure(maliciousSecure, statSecParam, inputBitCount);
+
+        // recver setup baseOT
+        PRNG prngR(sysRandomSeed());
+        KkrtNcoOtReceiver recver;
+        recver.configure(maliciousSecure, statSecParam, inputBitCount);
+
+        // sender genBaseOT
+        auto countS = sender.getBaseOTCount();
+        std::vector<block> msgsS(countS);
+        DefaultBaseOT baseS;
+        RECEIVER recverBaseS;
+        BitVector bv(countS);
+        bv.randomize(prngS);
+        // sender.genBaseOtsStep1(baseS, PRNG &prng, std::vector<std::array<block, 2>> &msgs)
+
+
+        // recver genBaseOT
+        auto countR = recver.getBaseOTCount();
+        std::vector<std::array<block, 2>> msgsR(countR);
+        DefaultBaseOT baseR;
+
+        SENDER senderBaseR;
+        u8 S_pack[SIMPLEST_OT_PACK_BYTES];
+        std::cout<<"baseR.sendSPack"<<std::endl;
+        baseR.sendSPack(senderBaseR, msgsR, prngR, S_pack);
+
+        // u8* RS_pack_result[4*SIMPLEST_OT_PACK_BYTES];
+        u8* RS_pack_result =  (u8*)malloc( 4*SIMPLEST_OT_PACK_BYTES * countR * sizeof(u8));
+        std::cout<<"baseS.receiveSPack"<<std::endl;
+        baseS.receiveSPack(recverBaseS, bv, msgsS, prngS, S_pack, RS_pack_result);
+
+        baseR.sendMessage(senderBaseR, msgsR, RS_pack_result);
+
+        sender.setBaseOts(msgsS, bv);
+        recver.setBaseOts(msgsR);
+
+        // sender set kkrt message
+        Matrix<block> sendMessagesEach(1, numChosenMsgs);
+        Matrix<block> sendMessages(numOTs, numChosenMsgs);
+        // prng.get(sendMessages.data(), sendMessages.size());
+        prngR.get(sendMessagesEach.data(), sendMessagesEach.size());
+        for (int i = 0; i < numOTs; i++)
+        {
+            for (int j = 0; j < numChosenMsgs; j++)
+            {
+                sendMessages[i][j] = sendMessagesEach[0][j];
+            }
+        }
+
+    }
 }

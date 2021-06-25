@@ -41,6 +41,69 @@ void osuCrypto::NcoOtExtReceiver::genBaseOts(PRNG& prng, Channel& chl)
     setBaseOts(msgs, prng, chl);
 }
 
+// void osuCrypto::NcoOtExtReceiver::genBaseOtsStep1(DefaultBaseOT base, SENDER sender, span<std::array<block, 2>> msgs, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES])
+// {
+//     // auto count = getBaseOTCount();
+//     // std::vector<std::array<block, 2>> msgs(count);
+
+// #ifdef ENABLE_IKNP
+//     if (!isMalicious())
+//     {
+//         IknpOtExtSender sender;
+//         sender.genBaseOts(prng, chl);
+//         sender.send(msgs, prng, chl);
+//         setBaseOts(msgs, prng, chl);
+//         return;
+//     }
+// #endif
+
+// #ifdef ENABLE_KOS
+//     KosOtExtSender sender;
+//     sender.genBaseOts(prng, chl);
+//     sender.send(msgs, prng, chl);
+// #elif defined LIBOTE_HAS_BASE_OT
+//     // DefaultBaseOT base;
+//     base.sendSPack(sender, msgs, prng, S_pack);
+//     // setBaseOts(msgs, prng, chl);
+// #else
+//     throw std::runtime_error(
+//         "The libOTe library does not have base OTs. Enable "
+//         "them to call this. " LOCATION);
+// #endif
+
+//     // setBaseOts(msgs, prng, chl);
+// }
+
+// void osuCrypto::NcoOtExtSender::genBaseOtsStep2(DefaultBaseOT base, RECEIVER receiver, const BitVector& choices, span<block> msgs, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result[SIMPLEST_OT_PACK_BYTES])
+// {
+// #ifdef ENABLE_IKNP
+//     if (!isMalicious())
+//     {
+//         IknpOtExtReceiver recver;
+//         recver.genBaseOts(prng, chl);
+//         recver.receive(bv, msgs, prng, chl);
+//         setBaseOts(msgs, bv, chl);
+//         return;
+//     }
+// #endif
+
+// #ifdef ENABLE_KOS
+//     KosOtExtReceiver recver;
+//     recver.genBaseOts(prng, chl);
+//     recver.receive(bv, msgs, prng, chl);
+// #elif defined LIBOTE_HAS_BASE_OT
+//     // DefaultBaseOT base;
+//     base.receiveSPack(receiver, choices, msgs, prng, S_pack, RS_pack_result);
+//     // setBaseOts(msgs, bv, chl);
+// #else
+//     throw std::runtime_error(
+//         "The libOTe library does not have base OTs. Enable "
+//         "them to call this. " LOCATION);
+// #endif
+
+//     // setBaseOts(msgs, bv, chl);
+// }
+
 void osuCrypto::NcoOtExtSender::genBaseOts(PRNG& prng, Channel& chl)
 {
     auto count = getBaseOTCount();

@@ -1,6 +1,7 @@
 #pragma once
 // This file and the associated implementation has been placed in the public domain, waiving all
 // copyright. No restrictions are placed on its use.
+#include "libOTe/Base/BaseOT.h"
 #include <cryptoTools/Common/Defines.h>
 #include <cryptoTools/Common/MatrixView.h>
 #include <array>
@@ -133,6 +134,9 @@ public:
     // @ prng: randomness source
     // @ chl: the socket that should be communicated over.
     void sendChosen(MatrixView<block> messages, PRNG& prng, Channel& chl);
+
+    // void genBaseOtsStep2(DefaultBaseOT base, RECEIVER receiver, const BitVector& choices, span<block> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result[SIMPLEST_OT_PACK_BYTES]);
+
 };
 
 
@@ -241,6 +245,8 @@ public:
     // @ chl: the socket that should be communicated over.
     void receiveChosen(
         u64 numMsgsPerOT, span<block> messages, span<u64> choices, PRNG& prng, Channel& chl);
+
+    // void genBaseOtsStep1(DefaultBaseOT base, SENDER sender, span<std::array<block, 2>> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES]);
 };
 
 }  // namespace osuCrypto

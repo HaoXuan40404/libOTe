@@ -60,6 +60,10 @@ public:
         mMultiKeyAES = std::move(v.mMultiKeyAES);
     }
 
+    void genBaseOtsStep1(PRNG& prng, std::vector<std::array<block, 2>>& msgs);
+
+    void initStep1(u64 numOTExt, PRNG& prng, block& seed, u8* comm);
+
     bool isMalicious() const override { return false; }
 
     // This function should be called first. It sets a variety of internal parameters such as
