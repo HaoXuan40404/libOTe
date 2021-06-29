@@ -62,7 +62,9 @@ public:
 
     void genBaseOtsStep1(PRNG& prng, std::vector<std::array<block, 2>>& msgs);
 
-    void initStep1(u64 numOTExt, PRNG& prng, block& seed, u8* comm);
+    void initStep1(u64 numOTExt, block& seed, u8* comm);
+    void initStep2(block& seed, block& theirSeed);
+    u64 recvCorrection(u64 recvCount, u8* matrix);
 
     bool isMalicious() const override { return false; }
 

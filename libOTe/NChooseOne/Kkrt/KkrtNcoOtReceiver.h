@@ -105,6 +105,8 @@ public:
     // @ prng: A random number generator for initializing the OTs
     // @ Channel: the channel that should be used to communicate with the sender.
     void init(u64 numOtExt, PRNG& prng, Channel& chl) override;
+    void initStep1(u64 numOtExt, block seed, u8* theirComm, block theirSeed);
+    void sendCorrection(u64 sendCount, u8* matrix);
 
     using NcoOtExtReceiver::encode;
 
@@ -151,6 +153,7 @@ public:
     // Allows a single NcoOtExtReceiver to be split into two, with each being
     // independent of each other.
     KkrtNcoOtReceiver splitBase();
+
 };
 
 }  // namespace osuCrypto

@@ -1,4 +1,6 @@
 #include "KkrtNcoOtSender.h"
+#include <cstring>
+#include <iostream>
 #ifdef ENABLE_KKRT
 #include "KkrtDefines.h"
 #include "libOTe/Tools/Tools.h"
@@ -70,12 +72,12 @@ std::unique_ptr<NcoOtExtSender> KkrtNcoOtSender::split()
     return std::make_unique<KkrtNcoOtSender>(std::move(splitBase()));
 }
 
-void KkrtNcoOtSender::initStep1(u64 numOTExt, PRNG& prng, block& seed, u8 comm[RandomOracle::HashSize])
+void KkrtNcoOtSender::initStep1(u64 numOTExt, block& seed, u8 comm[RandomOracle::HashSize])
 {
 
     static const u8 superBlkSize(8);
 
-    seed = prng.get<block>();
+    // seed = prng.get<block>();
     // block theirSeed;
     RandomOracle hasher;
     hasher.Update(seed);
@@ -171,6 +173,13 @@ void KkrtNcoOtSender::initStep1(u64 numOTExt, PRNG& prng, block& seed, u8 comm[R
 //     std::array<block, 4> keys;
 //     PRNG(seed ^ theirSeed).get(keys.data(), keys.size());
 //     mMultiKeyAES.setKeys(keys);
+}
+
+void KkrtNcoOtSender::initStep2(block& seed, block& theirSeed)
+{
+    std::array<block, 4> keys;
+    PRNG(seed ^ theirSeed).get(keys.data(), keys.size());
+    mMultiKeyAES.setKeys(keys);
 }
 
 void KkrtNcoOtSender::init(u64 numOTExt, PRNG& prng, Channel& chl)
@@ -295,6 +304,7 @@ void KkrtNcoOtSender::encode(u64 otIdx, const void* input, void* dest, u64 destS
     mMultiKeyAES.ecbEncNBlocks(choice.data(), code.data());
 
     auto* corVal = mCorrectionVals.data() + otIdx * mCorrectionVals.stride();
+    // std::cout<<"sender encode mCorrectionVals.stride() = "<<mCorrectionVals.stride()<<std::endl;
     auto* tVal = mT.data() + otIdx * mT.stride();
 
     // This is the hashing phase. Here we are using pseudo-random codewords.
@@ -384,6 +394,64 @@ void KkrtNcoOtSender::recvCorrection(Channel& chl, u64 recvCount)
     mCorrectionIdx += recvCount;
 }
 
+u64 KkrtNcoOtSender::recvCorrection(u64 recvCount, u8* matrix)
+{
+        // memcpy(&mCorrectionVals, matrix, recvCount * sizeof(block) * mCorrectionVals.stride());
+    // auto dest = mCorrectionVals.data() + i32(mCorrectionIdx * mCorrectionVals.stride());
+    // auto maxReceiveCount = (mCorrectionVals.rows() - mCorrectionIdx) * mCorrectionVals.stride();
+    // std::cout<<"maxReceiveCount = "<<maxReceiveCount<<std::endl;
+    // ReceiveAtMost<block> receiver(dest, maxReceiveCount);
+    // receiver.mTrueReceiveSize = mCorrectionVals.stride() * recvCount;
+    // // memcpy(&receiver.mData, matrix, maxReceiveCount);
+    // memcpy(&mCorrectionVals, matrix, recvCount * sizeof(block) * mCorrectionVals.stride());
+    // std::cout<<"recvCorrection receiver mData = "<<receiver.mData<<std::endl;
+    // if (receiver.receivedSize() % mCorrectionVals.stride())
+    //     throw std::runtime_error("An even number of correction blocks were not sent. " LOCATION);
+
+    // // compute how many corrections were received.
+    // auto numCorrections = receiver.receivedSize() / mCorrectionVals.stride();
+    // std::cout<<"numCorrections = "<<numCorrections<<std::endl;
+    // std::cout<<"receiver.receivedSize() = "<<receiver.receivedSize()<<std::endl;
+    // std::cout<<"mCorrectionVals.stride() = "<<mCorrectionVals.stride()<<std::endl;
+
+    // update the index of there we should store the next set of correction
+    // values.
+    // std::cout<<"start numCorrections = "<<mCorrectionIdx<<std::endl;
+    mCorrectionIdx += recvCount;
+    // std::cout<<"final mCorrectionIdx = "<<mCorrectionIdx<<std::endl;
+
+    return mCorrectionIdx;
+
+    // receive the next OT correction values. This will be several rows of the
+    // form u = T0 + T1 + C(w) there c(w) is a pseudo-random code.
+    // auto dest = mCorrectionVals.data() + i32(mCorrectionIdx * mCorrectionVals.stride());
+    // auto maxReceiveCount = (mCorrectionVals.rows() - mCorrectionIdx) * mCorrectionVals.stride();
+    // memcpy(&dest, matrix, recvCount * sizeof(block) * mCorrectionVals.stride());
+    // auto dest = mCorrectionVals.begin() + (mCorrectionIdx * mCorrectionVals.stride());
+    // memcpy(&dest, matrix, recvCount * sizeof(block) * mCorrectionVals.stride());
+
+    // ReceiveAtMost<block> receiver(dest, maxReceiveCount);
+    // memcpy(&receiver, matrix, recvCount * sizeof(block) * mCorrectionVals.stride());
+
+    // update the index of there we should store the next set of correction
+    // values.
+     // check that the number of blocks received is ok.
+    // if (receiver.receivedSize() % mCorrectionVals.stride())
+    //     throw std::runtime_error("An even number of correction blocks were not sent. " LOCATION);
+
+    // // compute how many corrections were received.
+    // auto numCorrections = receiver.receivedSize() / mCorrectionVals.stride();
+
+    // // update the index of there we should store the next set of correction
+    // // values.
+    // std::cout<<"start numCorrections = "<<mCorrectionIdx<<std::endl;
+    // mCorrectionIdx += numCorrections;
+    // return numCorrections;
+    // mCorrectionIdx += recvCount;
+    // return mCorrectionIdx;
+}
+
+
 u64 KkrtNcoOtSender::recvCorrection(Channel& chl)
 {
     // receive the next OT correction values. This will be several rows of the
@@ -393,6 +461,7 @@ u64 KkrtNcoOtSender::recvCorrection(Channel& chl)
 
     ReceiveAtMost<block> receiver(dest, maxReceiveCount);
     chl.recv(receiver);
+    std::cout<<"recvCorrection receiver mData = "<<receiver.mData<<std::endl;
 
     // check that the number of blocks received is ok.
     if (receiver.receivedSize() % mCorrectionVals.stride())
@@ -403,8 +472,13 @@ u64 KkrtNcoOtSender::recvCorrection(Channel& chl)
 
     // update the index of there we should store the next set of correction
     // values.
+    // std::cout<<"start numCorrections = "<<mCorrectionIdx<<std::endl;
     mCorrectionIdx += numCorrections;
-
+    // std::cout<<"final numCorrections = "<<mCorrectionIdx<<std::endl;
+    std::cout<<"maxReceiveCount = "<<maxReceiveCount<<std::endl;
+    std::cout<<"numCorrections = "<<numCorrections<<std::endl;
+    std::cout<<"receiver.receivedSize() = "<<receiver.receivedSize()<<std::endl;
+    std::cout<<"mCorrectionVals.stride() = "<<mCorrectionVals.stride()<<std::endl;
     return numCorrections;
 }
 
