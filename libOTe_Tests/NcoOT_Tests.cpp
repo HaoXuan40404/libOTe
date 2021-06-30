@@ -758,11 +758,12 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         // M times N choose 1
         // numOTs M
         // numChosenMsgs N
-        auto numOTs = 1;  // Messages.rows()
+        auto numOTs = 2;  // Messages.rows()
         auto numChosenMsgs = 1000; // Messages.cols()
         bool maliciousSecure = false;
         u64 statSecParam = 40;
-        u64 inputBitCount = 76;  // the kkrt protocol default to 128 but oos can only do 76.
+        // u64 inputBitCount = 76;  // the kkrt protocol default to 128 but oos can only do 76.
+        u64 inputBitCount = 128;  // the kkrt protocol default to 128 but oos can only do 76.
 
         // sender setup baseOT
         PRNG prngS(sysRandomSeed());
@@ -810,9 +811,14 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         Matrix<block> sendMessages(numOTs, numChosenMsgs);
         // prng.get(sendMessages.data(), sendMessages.size());
         prngR.get(sendMessagesEach.data(), sendMessagesEach.size());
+
+        // fake meesage keys
+        std::vector<u64> keys;
         for (int i = 0; i < numChosenMsgs; i++)
         {
-            std::cout<<"idx i "<<i<<"sendMessagesEach="<<sendMessagesEach[0][i]<<std::endl;
+            keys.push_back(13020199606308+i);
+            std::cout<<"key-"<<13020199606308+i<<std::endl;
+            std::cout<<"idx-"<<i<<"=sendMessagesEach="<<sendMessagesEach[0][i]<<std::endl;
         }
         for (int i = 0; i < numOTs; i++)
         {
@@ -842,6 +848,7 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         sender.initStep2(seedS, seedR);
 
         std::vector<block> recvMsgs(numOTs);
+        std::vector<block> recvMsgsResult(numOTs);
         std::vector<u64> choices(numOTs);
         // get correction
         // auto sendCount = numOTs;
@@ -855,7 +862,8 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         std::cout<<"set recver random choose"<<std::endl;
         for (int i = 0; i < numOTs; ++i)
         {
-            choices[i] = prngR.get<u8>();
+            // choices[i] = prngR.get<u8>();
+            choices[i] =13020199606358+i;
             std::cout << "recver choices" << choices[i] << std::endl;
         }
 
@@ -863,15 +871,14 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         std::cout<<"recver encode"<<std::endl;
         std::array<u64, 2> choiceR{0, 0};
         auto& jR = choiceR[0];
-// block* t0Val = mT0.data() + mT0.stride() * otIdx;
+        // block* t0Val = mT0.data() + mT0.stride() * otIdx;
         for (u64 i = 0; i < recvMsgs.size(); ++i)
         {
             // recver.mCorrectionIdx
-            // memcpy(, const void *__restrict __src, size_t __n)
             jR = choices[i];
+            std::cout<<"recver jR = "<<jR<<std::endl;
             recver.encode(i, &jR, &recvMsgs[i]);
         }
-
 
         // sender encode
         // must be at least 128 bits.
@@ -889,20 +896,181 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
 
         for (u64 i = 0; i < sendMessages.rows(); ++i)
         {
-            for (jS = 0; jS < sendMessages.cols(); ++jS)
+            for (u64 jS1 = 0; jS1 < sendMessages.cols(); ++jS1)
             {
-                sender.encode(i, choiceS.data(), &tempS(i, jS));
-                tempS(i, jS) = tempS(i, jS) ^ sendMessages(i, jS);
+                jS = keys[jS1];
+                // std::cout<<"sender choiceS.data() = "<<choiceS.data()<<std::endl;
+                sender.encode(i, choiceS.data(), &tempS(i, jS1));
+                tempS(i, jS1) = tempS(i, jS1) ^ sendMessages(i, jS1);
             }
+            // for (jS = 0; jS < sendMessages.cols(); ++jS)
+            // {
+            //     // std::cout<<"sender choiceS.data() = "<<choiceS.data()<<std::endl;
+            //     sender.encode(i, choiceS.data(), &tempS(i, jS), keys[jS]);
+            //     tempS(i, jS) = tempS(i, jS) ^ sendMessages(i, jS);
+            // }
         }
 
         // recver decode
         std::cout<<"recver.decode"<<std::endl;
         for (u64 i = 0; i < recvMsgs.size(); ++i)
         {
-            recvMsgs[i] = recvMsgs[i] ^ tempS(i, choices[i]);
-            std::cout<<"recvMsgs = "<<recvMsgs[i]<<std::endl;
+            for (u64 jS1 = 0; jS1 < sendMessages.cols(); ++jS1)
+            {
+                std::cout<<"jS1 = "<<jS1<<std::endl;
+                recvMsgsResult[i] = recvMsgs[i] ^ tempS(i, jS1);
+                std::cout<<"recvMsgsResult = "<<recvMsgsResult[i]<<std::endl;
+            }
+            // recvMsgs[i] = recvMsgs[i] ^ tempS(i, choices[i]);
+            // std::cout<<"recvMsgs = "<<recvMsgs[i]<<std::endl;
         }
-
+        // for (u64 i = 0; i < recvMsgs.size(); ++i)
+        // {
+        //     recvMsgs[i] = recvMsgs[i] ^ tempS(i, choices[i]);
+        //     std::cout<<"recvMsgs = "<<recvMsgs[i]<<std::endl;
+        // }
     }
+
+//     void Wedpr_kkrt_ot_choose_local_test()
+//     {
+//         std::cout<<"Wedpr_kkrt_ot_choose_local_test"<<std::endl;
+//         // M times N choose 1
+//         // numOTs M
+//         // numChosenMsgs N
+//         auto numOTs = 1;  // Messages.rows()
+//         auto numChosenMsgs = 1000; // Messages.cols()
+//         bool maliciousSecure = false;
+//         u64 statSecParam = 40;
+//         u64 inputBitCount = 76;  // the kkrt protocol default to 128 but oos can only do 76.
+
+//         // sender setup baseOT
+//         PRNG prngS(sysRandomSeed());
+//         KkrtNcoOtSender sender;
+//         sender.configure(maliciousSecure, statSecParam, inputBitCount);
+
+//         // recver setup baseOT
+//         PRNG prngR(sysRandomSeed());
+//         KkrtNcoOtReceiver recver;
+//         recver.configure(maliciousSecure, statSecParam, inputBitCount);
+
+//         // sender genBaseOT
+//         auto countS = sender.getBaseOTCount();
+//         std::vector<block> msgsS(countS);
+//         DefaultBaseOT baseS;
+//         RECEIVER recverBaseS;
+//         BitVector bv(countS);
+//         bv.randomize(prngS);
+//         // sender.genBaseOtsStep1(baseS, PRNG &prng, std::vector<std::array<block, 2>> &msgs)
+
+
+//         // recver genBaseOT
+//         auto countR = recver.getBaseOTCount();
+//         std::vector<std::array<block, 2>> msgsR(countR);
+//         DefaultBaseOT baseR;
+
+//         SENDER senderBaseR;
+//         u8 S_pack[SIMPLEST_OT_PACK_BYTES];
+//         std::cout<<"baseR.sendSPack"<<std::endl;
+//         baseR.sendSPack(senderBaseR, msgsR, prngR, S_pack);
+
+//         // u8* RS_pack_result[4*SIMPLEST_OT_PACK_BYTES];
+//         u8* RS_pack_result =  (u8*)malloc( 4*SIMPLEST_OT_PACK_BYTES * countR * sizeof(u8));
+//         std::cout<<"baseS.receiveSPack"<<std::endl;
+//         baseS.receiveSPack(recverBaseS, bv, msgsS, prngS, S_pack, RS_pack_result);
+
+//         baseR.sendMessage(senderBaseR, msgsR, RS_pack_result);
+
+//         sender.setBaseOts(msgsS, bv);
+//         recver.setBaseOts(msgsR);
+
+//         // sender set kkrt message
+//         std::cout<<"sender set kkrt message"<<std::endl;
+//         Matrix<block> sendMessagesEach(1, numChosenMsgs);
+//         Matrix<block> sendMessages(numOTs, numChosenMsgs);
+//         prngR.get(sendMessagesEach.data(), sendMessagesEach.size());
+//         for (int i = 0; i < numChosenMsgs; i++)
+//         {
+//             std::cout<<"idx i "<<i<<"sendMessagesEach="<<sendMessagesEach[0][i]<<std::endl;
+//         }
+//         for (int i = 0; i < numOTs; i++)
+//         {
+//             for (int j = 0; j < numChosenMsgs; j++)
+//             {
+//                 sendMessages[i][j] = sendMessagesEach[0][j];
+//             }
+//         }
+
+//         // sender init step1
+//         std::cout<<"sender init step1"<<std::endl;
+
+//         // auto numOTExt = sendMessages.cols();
+//         std::cout<<"sendMessages.cols()"<<sendMessages.cols()<<std::endl;
+//         std::cout<<"sendMessages.rows()"<<sendMessages.rows()<<std::endl;
+
+//         block seedS = prngS.get<block>();
+//         u8 comm[RandomOracle::HashSize];
+//         std::cout<<"sender init step1"<<std::endl;
+//         sender.initStep1(numOTs, seedS, comm);
+
+//         // recver init step1
+//         std::cout<<"recver init step1"<<std::endl;
+//         block seedR = prngS.get<block>();
+//         recver.initStep1(numOTs, seedR, comm, seedS);
+//         std::cout<<"recver init step2"<<std::endl;
+//         sender.initStep2(seedS, seedR);
+
+//         std::vector<block> recvMsgs(numOTs);
+//         std::vector<u64> choices(numOTs);
+//         /// set recver random choose
+//         std::cout<<"set recver random choose"<<std::endl;
+//         for (int i = 0; i < numOTs; ++i)
+//         {
+//             choices[i] = prngR.get<u8>();
+//             std::cout << "recver choices" << choices[i] << std::endl;
+//         }
+
+//         // recver encode
+//         std::cout<<"recver encode"<<std::endl;
+//         std::array<u64, 2> choiceR{0, 0};
+//         auto& jR = choiceR[0];
+// // block* t0Val = mT0.data() + mT0.stride() * otIdx;
+//         for (u64 i = 0; i < recvMsgs.size(); ++i)
+//         {
+//             // recver.mCorrectionIdx
+//             // memcpy(, const void *__restrict __src, size_t __n)
+//             jR = choices[i];
+//             recver.encode(i, &jR, &recvMsgs[i]);
+//         }
+
+
+//         // sender encode
+//         // must be at least 128 bits.
+//         std::cout<<"start numCorrections = "<<sender.mCorrectionIdx<<std::endl;
+//         // belive all message have been receive
+//         sender.mCorrectionIdx=numOTs;
+//         std::array<u64, 2> choiceS{0, 0};
+//         u64& jS = choiceS[0];
+
+//         std::cout<<"sender.encode "<<std::endl;
+//         Matrix<block> tempS(sendMessages.rows(), numChosenMsgs);
+//         // recver send mT1.data(),
+//         memcpy(sender.mCorrectionVals.data(), recver.mT1.data(), recver.mT1.size()* sizeof(block));
+
+//         for (u64 i = 0; i < sendMessages.rows(); ++i)
+//         {
+//             for (jS = 0; jS < sendMessages.cols(); ++jS)
+//             {
+//                 sender.encode(i, choiceS.data(), &tempS(i, jS));
+//                 tempS(i, jS) = tempS(i, jS) ^ sendMessages(i, jS);
+//             }
+//         }
+
+//         // recver decode
+//         std::cout<<"recver.decode"<<std::endl;
+//         for (u64 i = 0; i < recvMsgs.size(); ++i)
+//         {
+//             recvMsgs[i] = recvMsgs[i] ^ tempS(i, choices[i]);
+//             std::cout<<"recvMsgs = "<<recvMsgs[i]<<std::endl;
+//         }
+//     }
 }

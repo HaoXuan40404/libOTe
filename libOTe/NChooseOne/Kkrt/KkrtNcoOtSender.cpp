@@ -1,6 +1,7 @@
 #include "KkrtNcoOtSender.h"
 #include <cstring>
 #include <iostream>
+#include <vector>
 #ifdef ENABLE_KKRT
 #include "KkrtDefines.h"
 #include "libOTe/Tools/Tools.h"
@@ -299,7 +300,7 @@ void KkrtNcoOtSender::encode(u64 otIdx, const void* input, void* dest, u64 destS
 
     block word = ZeroBlock;
     memcpy(&word, input, mInputByteCount);
-
+    // std::cout<<"KkrtNcoOtSender::encode word ="<<word<<std::endl;
     std::array<block, KKRT_WIDTH> choice{word, word, word, word}, code;
     mMultiKeyAES.ecbEncNBlocks(choice.data(), code.data());
 
@@ -345,6 +346,7 @@ void KkrtNcoOtSender::encode(u64 otIdx, const void* input, void* dest, u64 destS
     RandomOracle sha1(destSize);
     // hash it all to get rid of the correlation.
     sha1.Update((u8*)code.data(), sizeof(block) * mT.stride());
+    // std::cout<<"sha1 = code.data()"<<code.data()<<std::endl;
     sha1.Final((u8*)dest);
 #else
     std::array<block, 10> aesBuff;
@@ -357,6 +359,80 @@ void KkrtNcoOtSender::encode(u64 otIdx, const void* input, void* dest, u64 destS
     memcpy(dest, hashBuff, std::min(destSize, sizeof(block)));
 #endif
 }
+
+// void KkrtNcoOtSender::encode(u64 otIdx, const void* input, void* dest, u64 destSize, u64 key)
+// {
+// #ifndef NDEBUG
+//     if (eq(mCorrectionVals[otIdx][0], ZeroBlock))
+//         throw std::invalid_argument(
+//             "appears that we haven't received the "
+//             "receiver's choice yet. " LOCATION);
+// #endif  // !NDEBUG
+// #define KKRT_WIDTH 4
+//     // static const int width(4);
+
+//     block word = ZeroBlock;
+//     memcpy(&word, input, mInputByteCount);
+//     // memcpy(&word, input, mInputByteCount);
+//     // std::cout<<"KkrtNcoOtSender::encode word ="<<word<<std::endl;
+//     std::array<block, KKRT_WIDTH> choice{word, word, word, word}, code;
+//     mMultiKeyAES.ecbEncNBlocks(choice.data(), code.data());
+
+//     auto* corVal = mCorrectionVals.data() + otIdx * mCorrectionVals.stride();
+//     // std::cout<<"sender encode mCorrectionVals.stride() = "<<mCorrectionVals.stride()<<std::endl;
+//     auto* tVal = mT.data() + otIdx * mT.stride();
+
+//     // This is the hashing phase. Here we are using pseudo-random codewords.
+//     // That means we assume inputword is a hash of some sort.
+// #if KKRT_WIDTH == 4
+//     code[0] = code[0] ^ word;
+//     code[1] = code[1] ^ word;
+//     code[2] = code[2] ^ word;
+//     code[3] = code[3] ^ word;
+
+//     block t00 = corVal[0] ^ code[0];
+//     block t01 = corVal[1] ^ code[1];
+//     block t02 = corVal[2] ^ code[2];
+//     block t03 = corVal[3] ^ code[3];
+//     block t10 = t00 & mChoiceBlks[0];
+//     block t11 = t01 & mChoiceBlks[1];
+//     block t12 = t02 & mChoiceBlks[2];
+//     block t13 = t03 & mChoiceBlks[3];
+
+//     code[0] = tVal[0] ^ t10;
+//     code[1] = tVal[1] ^ t11;
+//     code[2] = tVal[2] ^ t12;
+//     code[3] = tVal[3] ^ t13;
+// #else
+
+//     for (u64 i = 0; i < KKRT_WIDTH; ++i)
+//     {
+//         code[i] = code[i] ^ word;
+
+//         block t0 = corVal[i] ^ code[i];
+//         block t1 = t0 & mChoiceBlks[i];
+
+//         code[i] = tVal[i] ^ t1;
+//     }
+// #endif
+
+// #ifdef KKRT_SHA_HASH
+//     RandomOracle sha1(destSize);
+//     // hash it all to get rid of the correlation.
+//     sha1.Update((u8*)code.data(), sizeof(block) * mT.stride());
+//     // std::cout<<"sha1 = code.data()"<<code.data()<<std::endl;
+//     sha1.Final((u8*)dest);
+// #else
+//     std::array<block, 10> aesBuff;
+//     mAesFixedKey.ecbEncBlocks(code.data(), mT.stride(), aesBuff.data());
+
+//     auto val = ZeroBlock;
+//     for (u64 i = 0; i < mT.stride(); ++i)
+//         val = val ^ code[i] ^ aesBuff[i];
+
+//     memcpy(dest, hashBuff, std::min(destSize, sizeof(block)));
+// #endif
+// }
 
 void KkrtNcoOtSender::configure(bool maliciousSecure, u64 statSecParam, u64 inputBitCount)
 {
