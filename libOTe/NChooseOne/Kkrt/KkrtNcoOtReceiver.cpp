@@ -31,14 +31,8 @@ void KkrtNcoOtReceiver::setBaseOts(gsl::span<std::array<block, 2>> baseRecvOts)
     }
 }
 
-void KkrtNcoOtReceiver::initStep1(u64 numOtExt, block seed, u8* theirComm, block theirSeed)
+void KkrtNcoOtReceiver::initStep1(u64 numOtExt, const block seed, const u8* theirComm, const block theirSeed)
 {
-
-    // block seed = prng.get<block>();
-    // u8 theirComm[RandomOracle::HashSize];
-
-    // auto fu = chl.asyncRecv(
-    //     theirComm, RandomOracle::HashSize, [&]() { chl.asyncSendCopy((u8*)&seed, sizeof(block)); });
 
 
     static const u64 superBlkSize(8);

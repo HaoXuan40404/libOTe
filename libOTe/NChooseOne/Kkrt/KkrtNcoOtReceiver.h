@@ -105,7 +105,7 @@ public:
     // @ prng: A random number generator for initializing the OTs
     // @ Channel: the channel that should be used to communicate with the sender.
     void init(u64 numOtExt, PRNG& prng, Channel& chl) override;
-    void initStep1(u64 numOtExt, block seed, u8* theirComm, block theirSeed);
+    void initStep1(u64 numOtExt, const block seed, const u8* theirComm, const block theirSeed);
     void sendCorrection(u64 sendCount, u8* matrix);
 
     using NcoOtExtReceiver::encode;

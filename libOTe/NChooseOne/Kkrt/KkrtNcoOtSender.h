@@ -63,7 +63,7 @@ public:
     void genBaseOtsStep1(PRNG& prng, std::vector<std::array<block, 2>>& msgs);
 
     void initStep1(u64 numOTExt, block& seed, u8* comm);
-    void initStep2(block& seed, block& theirSeed);
+    void initStep2(const block& seed, const block& theirSeed);
     u64 recvCorrection(u64 recvCount, u8* matrix);
 
     bool isMalicious() const override { return false; }
@@ -103,7 +103,6 @@ public:
     // @ numOtExt: denotes the number of OTs that can be used before init
     //      should be called again.
     void init(u64 numOtExt, PRNG& prng, Channel& chl) override;
-    void init_without_network(u64 numOTExt, PRNG& prng);
 
     using NcoOtExtSender::encode;
 

@@ -15,4 +15,5 @@ namespace tests_libOTe
     void Tools_LinearCode_rep_Test();
 
     void Wedpr_kkrt_ot_local_test();
+    void Wedpr_kkrt_ot_choose_normal_test();
 }

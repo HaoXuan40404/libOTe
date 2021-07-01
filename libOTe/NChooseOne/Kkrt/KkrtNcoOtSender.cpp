@@ -73,7 +73,7 @@ std::unique_ptr<NcoOtExtSender> KkrtNcoOtSender::split()
     return std::make_unique<KkrtNcoOtSender>(std::move(splitBase()));
 }
 
-void KkrtNcoOtSender::initStep1(u64 numOTExt, block& seed, u8 comm[RandomOracle::HashSize])
+void KkrtNcoOtSender::initStep1(u64 numOTExt, block& seed, u8* comm)
 {
 
     static const u8 superBlkSize(8);
@@ -167,16 +167,9 @@ void KkrtNcoOtSender::initStep1(u64 numOTExt, block& seed, u8 comm[RandomOracle:
 
         doneIdx = stopIdx;
     }
-
-    // future.get();
-    // chl.asyncSendCopy((u8*)&seed, sizeof(block));
-
-//     std::array<block, 4> keys;
-//     PRNG(seed ^ theirSeed).get(keys.data(), keys.size());
-//     mMultiKeyAES.setKeys(keys);
 }
 
-void KkrtNcoOtSender::initStep2(block& seed, block& theirSeed)
+void KkrtNcoOtSender::initStep2(const block& seed, const block& theirSeed)
 {
     std::array<block, 4> keys;
     PRNG(seed ^ theirSeed).get(keys.data(), keys.size());
