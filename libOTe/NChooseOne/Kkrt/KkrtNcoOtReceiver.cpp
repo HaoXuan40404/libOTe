@@ -33,8 +33,6 @@ void KkrtNcoOtReceiver::setBaseOts(gsl::span<std::array<block, 2>> baseRecvOts)
 
 void KkrtNcoOtReceiver::initStep1(u64 numOtExt, const block seed, const u8* theirComm, const block theirSeed)
 {
-
-
     static const u64 superBlkSize(8);
 
     // this will be used as temporary buffers of 128 columns,

@@ -56,6 +56,8 @@ namespace tests_libOTe
         tc.add("AknOt_sendRecv1000_Test            ", AknOt_sendRecv1000_Test);
         tc.add("Wedpr_kkrt_ot_local_test            ", Wedpr_kkrt_ot_local_test);
         tc.add("Wedpr_kkrt_ot_choose_normal_test            ", Wedpr_kkrt_ot_choose_normal_test);
+        tc.add("wedpr_kkrt_id_test            ", wedpr_kkrt_id_test);
+
     });
 
 

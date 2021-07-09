@@ -223,7 +223,7 @@ void AsmSimplestOT::sendSPack(SENDER& sender, span<std::array<block, 2>> msg, PR
     sender_genS(&sender, S_pack, rand);
 }
 
-void AsmSimplestOT::sendMessage(SENDER& sender, span<std::array<block, 2>> msg, u8* RS_pack_result)
+void AsmSimplestOT::sendMessage(SENDER& sender, span<std::array<block, 2>> msg, const u8* RS_pack_result)
 {
     u8 Rs_pack[4 * SIMPLEST_OT_PACK_BYTES];
     u8 keys[2][4][SIMPLEST_OT_HASHBYTES];
@@ -243,7 +243,7 @@ void AsmSimplestOT::sendMessage(SENDER& sender, span<std::array<block, 2>> msg, 
 
 }
 
-void AsmSimplestOT::receiveSPack(RECEIVER& receiver, const BitVector& choices, span<block> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result)
+void AsmSimplestOT::receiveSPack(RECEIVER& receiver, const BitVector& choices, span<block> msg, PRNG& prng, const u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result)
 {
     u8 Rs_pack[4 * SIMPLEST_OT_PACK_BYTES];
     u8 keys[4][SIMPLEST_OT_HASHBYTES];

@@ -87,9 +87,9 @@ public:
     // SIMPLEST_OT_PACK_BYTES = 32
     void sendSPack(SENDER& sender, span<std::array<block, 2>> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES]);
 
-    void receiveSPack(RECEIVER& receiver, const BitVector& choices, span<block> msg, PRNG& prng, u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result);
+    void receiveSPack(RECEIVER& receiver, const BitVector& choices, span<block> msg, PRNG& prng, const u8 S_pack[SIMPLEST_OT_PACK_BYTES], u8* RS_pack_result);
 
-    void sendMessage(SENDER& sender, span<std::array<block, 2>> msg, u8* RS_pack_result);
+    void sendMessage(SENDER& sender, span<std::array<block, 2>> msg, const u8* RS_pack_result);
 };
 
 #endif

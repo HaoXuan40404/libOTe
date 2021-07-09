@@ -39,6 +39,8 @@
 
 // ppc
 #include <cryptoTools/Crypto/RandomOracle.h>
+#include "libOTe/NChooseOne/Kkrt/WedprKkrtSender.h"
+#include "libOTe/NChooseOne/Kkrt/WedprKkrtReceiver.h"
 
 using namespace osuCrypto;
 
@@ -898,7 +900,7 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         {
             for (u64 j = 0; j < sendMessages.cols(); ++j)
             {
-                std::cout<<"index j = "<<j<<std::endl;
+                // std::cout<<"index j = "<<j<<std::endl;
                 recvMsgsResult[i] = recvMsgs[i] ^ tempS(i, j);
                 std::cout<<"recvMsgsResult = "<<recvMsgsResult[i]<<std::endl;
             }
@@ -1045,5 +1047,66 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
             recvMsgs[i] = recvMsgs[i] ^ tempS(i, choices[i]);
             std::cout<<"recvMsgs = "<<recvMsgs[i]<<std::endl;
         }
+    }
+
+    void wedpr_kkrt_id_test() {
+        std::cout<<"wedpr_kkrt_id_test"<<std::endl;
+        u64 numOTs = 2;  // Messages.rows()
+        u64 numChosenMsgs = 500; // Messages.cols()
+
+        // fake choice
+        std::vector<u64> choices(numOTs);
+        for (u64 i = 0; i < numOTs; i++)
+        {
+            // choices[i] = prngR.get<u8>();
+            choices[i] =13020199606358+i;
+            std::cout << "recver set choices = " << choices[i] << std::endl;
+        }
+
+        // fake mssages
+        Matrix<block> sendMessages(numOTs, numChosenMsgs);
+        std::vector<u64> keys(numChosenMsgs);
+        for (u64 i = 0; i < numChosenMsgs; i++)
+        {
+            // keys.push_back(13020199606308+i);
+            keys[i] = 13020199606308+i;
+            // std::cout<<"key-"<<keys[i]<<std::endl;
+            for (u64 j = 0; j < numOTs; j++) {
+                if(i > 255) {
+                    sendMessages[j][i] = block(char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(i/255),char(i));
+                }
+                else {
+                sendMessages[j][i] = block(char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(0),char(i));
+                }
+
+            }
+            std::cout<<"idx-"<<keys[i]<<"=sendMessagesEach="<<sendMessages[0][i]<<std::endl;
+        }
+
+        WedprKkrtSender sender(numOTs, numChosenMsgs, sendMessages, keys);
+        WedprKkrtReceiver recver(numOTs, numChosenMsgs, choices);
+
+        u8 sPack[SIMPLEST_OT_PACK_BYTES];
+        std::cout<<"recver.step1"<<std::endl;
+        recver.step1(sPack);
+        u8* rSPackResult =  (u8*)malloc( 4*SIMPLEST_OT_PACK_BYTES * 512 * sizeof(u8));
+        std::cout<<"sender.step1"<<std::endl;
+        sender.step1(sPack, rSPackResult);
+        std::cout<<"recver.step2"<<std::endl;
+        recver.step2(rSPackResult);
+        block senderSeed;
+        u8 comm[RandomOracle::HashSize];
+        std::cout<<"sender.step2"<<std::endl;
+        sender.step2(senderSeed, comm);
+        block recverSeed;
+        Matrix<block> mT(numOTs, numChosenMsgs);
+        std::cout<<"recver.step3"<<std::endl;
+        recver.step3(senderSeed, comm, recverSeed, mT);
+        Matrix<block> sendMatrix(numOTs, numChosenMsgs);
+        std::cout<<"sender.step3"<<std::endl;
+        sender.step3(senderSeed, recverSeed, mT, sendMatrix);
+        std::cout<<"recver.step4"<<std::endl;
+        recver.step4(sendMatrix);
+        free(rSPackResult);
     }
 }
