@@ -14,7 +14,7 @@ using namespace std;
         kkrtNcoOtReceiver.setBaseOts(msgsBase);
     }
 
-    void WedprKkrtReceiver::step3(const block theirSeed, const u8* comm,block& MySeed, Matrix<block>& mT) {
+    void WedprKkrtReceiver::step3(const block& theirSeed, const u8* comm,block& MySeed, Matrix<block>& mT) {
         MySeed = prng.get<block>();
         kkrtNcoOtReceiver.initStep1(numOTs, MySeed, comm, theirSeed);
         std::array<u64, 2> choice{0, 0};
@@ -31,7 +31,7 @@ using namespace std;
         memcpy(mT.data(), kkrtNcoOtReceiver.mT1.data(), kkrtNcoOtReceiver.mT1.size()* sizeof(block));
     }
 
-    void WedprKkrtReceiver::step4(const Matrix<block> sendMatrix) {
+    void WedprKkrtReceiver::step4(const Matrix<block>& sendMatrix) {
         for (u64 i = 0; i < recvMsgs.size(); ++i)
         {
             for (u64 j = 0; j < sendMatrix.cols(); ++j)

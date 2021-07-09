@@ -27,7 +27,7 @@ public:
     // WedprKkrtSender() = default;
     // WedprKkrtSender(const WedprKkrtSender&) = delete;
     // should use k-v map ids-messages
-    WedprKkrtSender(u64 chooseCount, u64 msgsCount, Matrix<block> messages, std::vector<u64> ids) {
+    WedprKkrtSender(u64 chooseCount, u64 msgsCount, const Matrix<block>& messages, const std::vector<u64>& ids) {
         numOTs = chooseCount;
         numChosenMsgs = msgsCount;
         sendMessages = messages;
@@ -41,11 +41,8 @@ public:
         prng.SetSeed(_prng.getSeed());
         kkrtNcoOtSender.configure(maliciousSecure, statSecParam, inputBitCount);
         countBase = kkrtNcoOtSender.getBaseOTCount();
-        std::cout<<"countBase = "<<countBase<<std::endl;
-        std::vector<block> msgsS(countBase);
-        msgsBase = msgsS;
-        BitVector bvS(countBase);
-        bv = bvS;
+        msgsBase.resize(countBase);
+        bv.resize(countBase);
         bv.randomize(prng);
     };
 
@@ -53,7 +50,7 @@ public:
 
     void step1(const u8* SPack, u8* RSPackResult);
     void step2(block& seed, u8* comm);
-    void step3(block& mySeed, block& theirSeed,  Matrix<block>& mT, Matrix<block>& sendMatrix);
+    void step3(const block& mySeed, const block& theirSeed,  const Matrix<block>& mT, Matrix<block>& sendMatrix);
 };
 }
 

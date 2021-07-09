@@ -1089,10 +1089,12 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         u8 sPack[SIMPLEST_OT_PACK_BYTES];
         std::cout<<"recver.step1"<<std::endl;
         recver.step1(sPack);
-        u8* rSPackResult =  (u8*)malloc( 4*SIMPLEST_OT_PACK_BYTES * 512 * sizeof(u8));
+        // u8* rSPackResult =  (u8*)malloc( 4*SIMPLEST_OT_PACK_BYTES * 512 * sizeof(u8));
+        u8 rSPackResult[4*SIMPLEST_OT_PACK_BYTES * 512];
         std::cout<<"sender.step1"<<std::endl;
         sender.step1(sPack, rSPackResult);
         std::cout<<"recver.step2"<<std::endl;
+        // Base OT so extract step2 individual
         recver.step2(rSPackResult);
         block senderSeed;
         u8 comm[RandomOracle::HashSize];
@@ -1107,6 +1109,6 @@ throw UnitTestSkipped("ENALBE_KKRT is not defined.");
         sender.step3(senderSeed, recverSeed, mT, sendMatrix);
         std::cout<<"recver.step4"<<std::endl;
         recver.step4(sendMatrix);
-        free(rSPackResult);
+        // free(rSPackResult);
     }
 }

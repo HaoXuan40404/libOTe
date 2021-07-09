@@ -15,7 +15,7 @@ using namespace std;
         kkrtNcoOtSender.initStep1(numOTs, seed, comm);
     }
 
-    void WedprKkrtSender::step3(block& mySeed, block& theirSeed,  Matrix<block>& mT, Matrix<block>& sendMatrix){
+    void WedprKkrtSender::step3(const block& mySeed, const block& theirSeed,  const Matrix<block>& mT, Matrix<block>& sendMatrix){
         std::array<u64, 2> choice{0, 0};
         kkrtNcoOtSender.initStep2(mySeed, theirSeed);
         std::cout<<"try copy mT"<<std::endl;

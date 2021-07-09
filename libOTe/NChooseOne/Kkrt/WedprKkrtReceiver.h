@@ -26,7 +26,7 @@ public:
 
     // WedprKkrtReceiver() = default;
     // WedprKkrtReceiver(const WedprKkrtReceiver&) = delete;
-    WedprKkrtReceiver(u64 chooseCount, u64 msgsCount, std::vector<u64> chooses) {
+    WedprKkrtReceiver(u64 chooseCount, u64 msgsCount, const std::vector<u64>& chooses) {
         numOTs = chooseCount;
         numChosenMsgs = msgsCount;
         keys = chooses;
@@ -39,12 +39,9 @@ public:
         // prng(sysRandomSeed());
         kkrtNcoOtReceiver.configure(maliciousSecure, statSecParam, inputBitCount);
         countBase = kkrtNcoOtReceiver.getBaseOTCount();
-        std::vector<std::array<block, 2>> msgsR(countBase);
-        msgsBase = msgsR;
-        std::vector<block> _recvMsgs(numOTs);
-        std::vector<block> _recvMsgsResult(numOTs);
-        recvMsgs = _recvMsgs;
-        recvMsgsResult = _recvMsgsResult;
+        msgsBase.resize(countBase);
+        recvMsgs.resize(numOTs);
+        recvMsgsResult.resize(numOTs);
     };
 
 
@@ -52,8 +49,8 @@ public:
 
     void step1(u8* SPack);
     void step2(const u8* RSPackResult);
-    void step3(const block theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT);
-    void step4(const Matrix<block> sendMatrix);
+    void step3(const block& theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT);
+    void step4(const Matrix<block>& sendMatrix);
 };
 }
 
