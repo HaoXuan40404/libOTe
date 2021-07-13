@@ -1,13 +1,14 @@
 #pragma once
 #include "libOTe/NChooseOne/Kkrt/KkrtNcoOtReceiver.h"
-
+// #include <cryptoTools/Crypto/RandomOracle.h>
 
 namespace osuCrypto
 {
-class WedprKkrtReceiver {
+class WedprKkrtReceiver
+{
 public:
-    u64 numOTs;
-    u64 numChosenMsgs;
+    u64 choiceCount;
+    u64 msgCount;
     KkrtNcoOtReceiver kkrtNcoOtReceiver;
     bool maliciousSecure = false;
     u64 countBase;
@@ -21,14 +22,15 @@ public:
     std::vector<u64> keys;
     std::vector<block> recvMsgs;
     std::vector<block> recvMsgsResult;
-
+    std::vector<std::vector<block>> dataMessage;  // decrept message
 
 
     // WedprKkrtReceiver() = default;
     // WedprKkrtReceiver(const WedprKkrtReceiver&) = delete;
-    WedprKkrtReceiver(u64 chooseCount, u64 msgsCount, const std::vector<u64>& chooses) {
-        numOTs = chooseCount;
-        numChosenMsgs = msgsCount;
+    WedprKkrtReceiver(u64 _choiceCount, u64 _msgCount, const std::vector<u64>& chooses)
+    {
+        choiceCount = _choiceCount;
+        msgCount = _msgCount;
         keys = chooses;
         // for(int i = 0; i < chooseCount; i++) {
         //     std::cout << "init keys[i] = " << keys[i] << std::endl;
@@ -40,19 +42,23 @@ public:
         kkrtNcoOtReceiver.configure(maliciousSecure, statSecParam, inputBitCount);
         countBase = kkrtNcoOtReceiver.getBaseOTCount();
         msgsBase.resize(countBase);
-        recvMsgs.resize(numOTs);
-        recvMsgsResult.resize(numOTs);
+        recvMsgs.resize(choiceCount);
+        recvMsgsResult.resize(choiceCount);
     };
 
 
-    ~WedprKkrtReceiver(){}
+    ~WedprKkrtReceiver() {}
 
-    void step1(u8* SPack);
-    void step2(const u8* RSPackResult);
-    void step3(const block& theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT);
-    void step4(const Matrix<block>& sendMatrix);
+    void step1InitBaseOt(u8* SPack);
+    void step3SetSeedPack(const u8* RSPackResult);
+    void step5InitMatrix(const block& theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT);
+    void step7GetFinalResult(const Matrix<block>& sendMatrix);
+    void step7GetFinalResultWithDecMessage(const Matrix<block>& sendMatrix,
+        std::vector<std::vector<block>> enMessage, std::vector<std::vector<u8>> hash);
+    void step7GetFinalResultWithChoice(
+        const Matrix<block>& sendMatrix, const std::vector<block>& optChoice);
 };
-}
+}  // namespace osuCrypto
 
 // #ifdef ENABLE_KKRT
 

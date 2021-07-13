@@ -1,13 +1,15 @@
 #pragma once
 #include "libOTe/NChooseOne/Kkrt/KkrtNcoOtSender.h"
+// #include <cryptoTools/Crypto/RandomOracle.h>
 
 
 namespace osuCrypto
 {
-class WedprKkrtSender {
+class WedprKkrtSender
+{
 public:
-    u64 numOTs;
-    u64 numChosenMsgs;
+    u64 choiceCount;
+    u64 msgCount;
     KkrtNcoOtSender kkrtNcoOtSender;
     DefaultBaseOT base;
     PRNG prng;
@@ -18,8 +20,13 @@ public:
     u64 statSecParam = 40;
     u64 inputBitCount = 128;
     RECEIVER recver;
-    Matrix<block> sendMessages;
-    std::vector<u64> keys;
+    Matrix<block> messages;  // OT message
+    std::vector<u64> keys;   // index
+
+    // for aes
+    std::vector<std::vector<u8>> hash;            // OT message Hash
+    std::vector<std::vector<block>> dataMessage;  // maybe useless
+    std::vector<std::vector<block>> enMessage;
 
     // block seed;
 
@@ -27,11 +34,13 @@ public:
     // WedprKkrtSender() = default;
     // WedprKkrtSender(const WedprKkrtSender&) = delete;
     // should use k-v map ids-messages
-    WedprKkrtSender(u64 chooseCount, u64 msgsCount, const Matrix<block>& messages, const std::vector<u64>& ids) {
-        numOTs = chooseCount;
-        numChosenMsgs = msgsCount;
-        sendMessages = messages;
-        keys = ids;
+    WedprKkrtSender(u64 _choiceCount, u64 _msgCount, const Matrix<block>& _messages,
+        const std::vector<u64>& _keys)
+    {
+        choiceCount = _choiceCount;
+        msgCount = _msgCount;
+        messages = _messages;
+        keys = _keys;
         // for(int i = 0; i < msgsCount; i++) {
         //     std::cout << "WedprKkrtSender init keys[i] = " << keys[i] << std::endl;
 
@@ -46,13 +55,43 @@ public:
         bv.randomize(prng);
     };
 
-    ~WedprKkrtSender(){}
+    WedprKkrtSender(u64 _choiceCount, u64 _msgCount,
+        const std::vector<std::vector<block>>& _dataMessage, const std::vector<u64>& _keys)
+    {
+        choiceCount = _choiceCount;
+        msgCount = _msgCount;
+        keys = _keys;
+        // prng(sysRandomSeed());
+        messages.resize(_choiceCount, _msgCount);
+        PRNG _prng(sysRandomSeed());
+        prng.SetSeed(_prng.getSeed());
+        kkrtNcoOtSender.configure(maliciousSecure, statSecParam, inputBitCount);
+        countBase = kkrtNcoOtSender.getBaseOTCount();
+        msgsBase.resize(countBase);
+        bv.resize(countBase);
+        bv.randomize(prng);
 
-    void step1(const u8* SPack, u8* RSPackResult);
-    void step2(block& seed, u8* comm);
-    void step3(const block& mySeed, const block& theirSeed,  const Matrix<block>& mT, Matrix<block>& sendMatrix);
+        // generate AES random key
+        // enc data block
+        // cpmute key hash
+        // need dataMessageToDecBlock
+        enMessage.resize(_msgCount);
+        hash.resize(_msgCount);
+        dataMessage = _dataMessage;
+    };
+
+    ~WedprKkrtSender() {}
+
+    void dataMessageToDecBlock();
+    void step2ExtendSeedPack(const u8* sPackBuffer, u8* rSPackResult);
+    void step4GenerateSeed(block& seed, u8* comm);
+    void step6SetMatrix(const block& theirSeed, const Matrix<block>& mT, const block& mySeed,
+        Matrix<block>& sendMatrix);
+    // void step6SetMatrixWithDecMessage(const block& theirSeed,  const Matrix<block>& mT, const
+    // block& mySeed, Matrix<block>& sendMatrix, std::vector<std::vector<block>> enMessage,
+    // std::vector<u8[RandomOracle::HashSize]> hash);
 };
-}
+}  // namespace osuCrypto
 
 // #ifdef ENABLE_KKRT
 
