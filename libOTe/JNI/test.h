@@ -1,3 +1,3 @@
-// #include "libOTe/Tools/Tools.h"
+#include "libOTe/Tools/Tools.h"
 
-// void testTry();
+void testTry();
