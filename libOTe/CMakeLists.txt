@@ -4,9 +4,15 @@ file(GLOB_RECURSE SRCS *.cpp)
 
 set(SRCS "${SRCS}")
 
-add_library(libOTe STATIC ${SRCS})
+# add_library(libOTe SHARED ${SRCS})
+# add_compile_options( -fPIC)
+find_package(JNI REQUIRED)
+include_directories(${JNI_INCLUDE_DIRS})
 
-target_include_directories(libOTe PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..) 
+# add_library(libOTe STATIC ${SRCS})
+add_library(libOTe ${SRCS})
+
+target_include_directories(libOTe PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(libOTe cryptoTools)
 
 if(ENABLE_SSE)
@@ -15,7 +21,7 @@ endif()
 
 if(ENABLE_SIMPLESTOT_ASM)
 	target_link_libraries(libOTe SimplestOT)
-    #target_compile_options(libOTe PRIVATE -fPIC -no-pie)
+    target_compile_options(libOTe PRIVATE -fPIC -no-pie)
 endif()
 
 if(ENABLE_MR_KYBER)

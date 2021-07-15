@@ -3,13 +3,19 @@ cmake_minimum_required (VERSION 2.8)
 
 project(libOTe)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -fno-pie -no-pie -fno-plt")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fno-pie -no-pie -fno-plt")
+set(CXXFLAGS "-fPIC -fno-pie -no-pie -fno-plt")
+set(CFLAGS "-fPIC -fno-pie -no-pie -fno-plt")
+SET(CMAKE_EXE_LINKER_FLAGS "-fpic -fno-pie -no-pie -fno-plt")
 
 if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
-
+	message("<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>")
 	############################################
 	#          If top level cmake              #
 	############################################
-	if(${CMAKE_VERSION} VERSION_LESS "3.12.0") 
+	if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
 		message("Please consider updating CMake to 3.12+")
 	endif()
 
@@ -24,22 +30,22 @@ if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
 	set(COMMON_FLAGS "-Wall -march=native -Wfatal-errors ")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS}")
-	
+
 	# -Wno-ignored-attributes -Wno-parentheses
-	# -maes -msse2 -msse3 -msse4.1 -mpclmul  
+	# -maes -msse2 -msse3 -msse4.1 -mpclmul
 	# -std=c++14
-	# -fPIC -no-pie 
+	# -fPIC -no-pie
 
 	# Select flags.
-	SET(CMAKE_CXX_FLAGS_RELEASE "-O3  -DNDEBUG") 
-	SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO " -O2 -g -ggdb -rdynamic")
-	SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g -ggdb -rdynamic")
-	
+	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3  -DNDEBUG")
+	SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -O2 -g -ggdb -rdynamic")
+	SET(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS} -O0 -g -ggdb -rdynamic")
+
 
 	############################################
 	#           Build mode checks              #
 	############################################
-	
+
 	# Set a default build type for single-configuration
 	# CMake generators if no build type is set.
 	if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -47,20 +53,20 @@ if("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
 	endif()
 
 	if(    NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release"
-       AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" 
+       AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
        AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-		  
-        message(FATAL_ERROR ": Unknown build type - \${CMAKE_BUILD_TYPE}=${CMAKE_BUILD_TYPE}.  Please use one of Debug, Release, or RelWithDebInfo. e.g. call\n\tcmake . -DCMAKE_BUILD_TYPE=Release\n" )        
+
+        message(FATAL_ERROR ": Unknown build type - \${CMAKE_BUILD_TYPE}=${CMAKE_BUILD_TYPE}.  Please use one of Debug, Release, or RelWithDebInfo. e.g. call\n\tcmake . -DCMAKE_BUILD_TYPE=Release\n" )
 	endif()
 endif()
- 
- 
+
+
 #############################################
 #    Build cryptoTools (common utilities)   #
 #############################################
 add_subdirectory(cryptoTools)
 
- 
+
 #############################################
 #                CONFIGURE                  #
 #############################################
@@ -142,10 +148,10 @@ message(STATUS "Option: OTE_KOS_FIAT_SHAMIR   = ${OTE_KOS_FIAT_SHAMIR}\n\n")
 #############################################
 
 if( NOT ENABLE_ALL_OT AND
-	NOT ENABLE_SIMPLESTOT AND 
-	NOT ENABLE_SIMPLESTOT_ASM AND 
-	NOT ENABLE_MR AND 
-	NOT ENABLE_MR_KYBER AND 
+	NOT ENABLE_SIMPLESTOT AND
+	NOT ENABLE_SIMPLESTOT_ASM AND
+	NOT ENABLE_MR AND
+	NOT ENABLE_MR_KYBER AND
 	NOT ENABLE_NP)
 	message(WARNING "NO Base OT enabled.")
 endif()
@@ -160,7 +166,7 @@ if ((ENABLE_SIMPLESTOT OR ENABLE_MR OR ENABLE_NP) AND
 endif()
 
 if(ENABLE_SSE)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} $   -maes -msse2 -msse3 -msse4.1 -mpclmul  ")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -maes -msse2 -msse3 -msse4.1 -mpclmul  ")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes -msse2 -msse3 -msse4.1 -mpclmul  ")
 endif()
 

@@ -4,10 +4,10 @@
 #define LIBOTE_VERSION (LIBOTE_VERSION_MAJOR * 10000 + LIBOTE_VERSION_MINOR * 100 + LIBOTE_VERSION_PATCH)
 
 // build the library with "simplest" Base OT enabled
-/* #undef ENABLE_SIMPLESTOT */
+#define ENABLE_SIMPLESTOT ON
 
 // build the library with the ASM "simplest" Base OT enabled
-#define ENABLE_SIMPLESTOT_ASM ON
+/* #undef ENABLE_SIMPLESTOT_ASM */
 
 // build the library with Masney Rindal Base OT enabled
 /* #undef ENABLE_MR */

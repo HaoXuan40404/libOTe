@@ -136,6 +136,124 @@ void SimplestOT::send(span<std::array<block, 2>> msg, PRNG& prng, Channel& chl)
         ro.Final(msg[i][1]);
     }
 }
+
+void SimplestOT::sendSPack(Curve& curve, Number&a,  PRNG& prng, std::vector<u8>& S_pack, block& seed)
+{
+    Point g = curve.getGenerator();
+    u64 pointSize = g.sizeBytes();
+
+    seed = prng.get<block>();
+    // Number a(curve, prng);
+    // Number a(curve);
+    std::cout << "saaaaaaa"<< a << std::endl;
+    // myTestA = a;
+    Point A = g * a;
+    std::vector<u8> buff(pointSize + mUniformOTs * sizeof(block)), hashBuff(pointSize);
+    A.toBytes(buff.data());
+
+    if (mUniformOTs)
+    {
+        // commit to the seed
+        auto comm = mAesFixedKey.ecbEncBlock(seed) ^ seed;
+        memcpy(buff.data() + pointSize, &comm, sizeof(block));
+    }
+    S_pack = buff;
+}
+
+void SimplestOT::sendMessage(Curve& curve, EccNumber& a, span<std::array<block, 2>> msg, block& seed, std::vector<u8>& RS_pack_result)
+{
+    Point g = curve.getGenerator();
+    u64 pointSize = g.sizeBytes();
+    u64 n = msg.size();
+
+
+    // Number a(curve, prng);
+    // Number a(curve);
+    // Number a = myTestA;
+    std::cout << "saaaaaaa"<< a << std::endl;
+    Point A = g * a;
+    std::vector<u8> buff(pointSize + mUniformOTs * sizeof(block)), hashBuff(pointSize);
+    A.toBytes(buff.data());
+
+    auto buffIter = RS_pack_result.data();
+
+    A *= a;
+    Point B(curve), Ba(curve);
+    for (u64 i = 0; i < n; ++i)
+    {
+        B.fromBytes(buffIter);
+        buffIter += pointSize;
+
+        Ba = B * a;
+        Ba.toBytes(hashBuff.data());
+        RandomOracle ro(sizeof(block));
+        ro.Update(hashBuff.data(), hashBuff.size());
+        if (mUniformOTs)
+            ro.Update(seed);
+        ro.Final(msg[i][0]);
+
+        Ba -= A;
+        Ba.toBytes(hashBuff.data());
+        ro.Reset();
+        ro.Update(hashBuff.data(), hashBuff.size());
+        if (mUniformOTs)
+            ro.Update(seed);
+        ro.Final(msg[i][1]);
+    }
+}
+
+void SimplestOT::receiveSPack(Curve& curve, const BitVector& choices, span<block> msg, PRNG& prng, const block& seed, std::vector<u8>& S_pack, std::vector<u8>& RS_pack_result)
+{
+    Point g = curve.getGenerator();
+    u64 pointSize = g.sizeBytes();
+    u64 n = msg.size();
+
+    block comm = oc::ZeroBlock;
+    Point A(curve);
+    std::vector<u8> buff(pointSize + mUniformOTs * sizeof(block)), hashBuff(pointSize);
+    buff = S_pack;
+    A.fromBytes(buff.data());
+
+    if (mUniformOTs)
+        memcpy(&comm, buff.data() + pointSize, sizeof(block));
+
+    buff.resize(pointSize * n);
+    auto buffIter = buff.data();
+
+    std::vector<Number> b;
+    b.reserve(n);
+    ;
+    std::array<Point, 2> B{curve, curve};
+    for (u64 i = 0; i < n; ++i)
+    {
+        b.emplace_back(curve, prng);
+        B[0] = g * b[i];
+        B[1] = A + B[0];
+
+        B[choices[i]].toBytes(buffIter);
+        buffIter += pointSize;
+    }
+    RS_pack_result = buff;
+    // chl.asyncSend(std::move(buff));
+    if (mUniformOTs)
+    {
+        // chl.recv(seed);
+        if (neq(comm, mAesFixedKey.ecbEncBlock(seed) ^ seed))
+            throw std::runtime_error("bad decommitment " LOCATION);
+    }
+
+    for (u64 i = 0; i < n; ++i)
+    {
+        B[0] = A * b[i];
+        B[0].toBytes(hashBuff.data());
+        RandomOracle ro(sizeof(block));
+        ro.Update(hashBuff.data(), hashBuff.size());
+        if (mUniformOTs)
+            ro.Update(seed);
+        ro.Final(msg[i]);
+    }
+}
+
 }  // namespace osuCrypto
 #endif
 

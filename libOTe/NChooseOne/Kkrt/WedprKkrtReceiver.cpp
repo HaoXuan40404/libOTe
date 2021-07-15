@@ -7,6 +7,18 @@
 namespace osuCrypto
 {
 using namespace std;
+#if defined(ENABLE_SIMPLESTOT)
+void WedprKkrtReceiver::step1InitBaseOt(std::vector<u8>& SPack) {
+    base.sendSPack(curve, randomNumber,prng, SPack, baseOtSeed);
+
+}
+    void WedprKkrtReceiver::step3SetSeedPack(std::vector<u8>& RSPackResult) {
+        base.sendMessage(curve, randomNumber, msgsBase, baseOtSeed, RSPackResult);
+        kkrtNcoOtReceiver.setBaseOts(msgsBase);
+    }
+#endif
+
+#ifdef ENABLE_SIMPLESTOT_ASM
 void WedprKkrtReceiver::step1InitBaseOt(u8* SPack)
 {
     base.sendSPack(sender, msgsBase, prng, SPack);
@@ -17,6 +29,7 @@ void WedprKkrtReceiver::step3SetSeedPack(const u8* RSPackResult)
     base.sendMessage(sender, msgsBase, RSPackResult);
     kkrtNcoOtReceiver.setBaseOts(msgsBase);
 }
+#endif
 
 void WedprKkrtReceiver::step5InitMatrix(
     const block& theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT)

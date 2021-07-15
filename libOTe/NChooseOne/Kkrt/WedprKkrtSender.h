@@ -1,7 +1,9 @@
 #pragma once
 #include "libOTe/NChooseOne/Kkrt/KkrtNcoOtSender.h"
 // #include <cryptoTools/Crypto/RandomOracle.h>
-
+#if defined(ENABLE_SIMPLESTOT)
+#include <cryptoTools/Crypto/Curve.h>
+#endif
 
 namespace osuCrypto
 {
@@ -19,7 +21,13 @@ public:
     u64 countBase;
     u64 statSecParam = 40;
     u64 inputBitCount = 128;
+#if defined(ENABLE_SIMPLESTOT)
+    EllipticCurve curve;
+    // EccNumber a;
+#endif
+#ifdef ENABLE_SIMPLESTOT_ASM
     RECEIVER recver;
+#endif
     Matrix<block> messages;  // OT message
     std::vector<u64> keys;   // index
 
@@ -53,6 +61,10 @@ public:
         msgsBase.resize(countBase);
         bv.resize(countBase);
         bv.randomize(prng);
+// #if defined(ENABLE_SIMPLESTOT)
+//         EccNumber _a(curve, prng);
+//         a = _a;
+// #endif
     };
 
     WedprKkrtSender(u64 _choiceCount, u64 _msgCount,
@@ -82,8 +94,17 @@ public:
 
     ~WedprKkrtSender() {}
 
+    // WedprKkrtSender* addressOfObject(void) {
+    //     return this;
+    // }
+
     void dataMessageToDecBlock();
+#if defined(ENABLE_SIMPLESTOT)
+    void step2ExtendSeedPack(block& baseOtSeed, std::vector<u8>& SPack, std::vector<u8>& RSPackResult);
+#endif
+#ifdef ENABLE_SIMPLESTOT_ASM
     void step2ExtendSeedPack(const u8* sPackBuffer, u8* rSPackResult);
+#endif
     void step4GenerateSeed(block& seed, u8* comm);
     void step6SetMatrix(const block& theirSeed, const Matrix<block>& mT, const block& mySeed,
         Matrix<block>& sendMatrix);

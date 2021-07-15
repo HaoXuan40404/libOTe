@@ -1,6 +1,9 @@
 #pragma once
 #include "libOTe/NChooseOne/Kkrt/KkrtNcoOtReceiver.h"
 // #include <cryptoTools/Crypto/RandomOracle.h>
+#if defined(ENABLE_SIMPLESTOT)
+#include <cryptoTools/Crypto/Curve.h>
+#endif
 
 namespace osuCrypto
 {
@@ -18,7 +21,14 @@ public:
     PRNG prng;
     // BitVector bv;
     std::vector<std::array<block, 2>> msgsBase;
+#if defined(ENABLE_SIMPLESTOT)
+    EllipticCurve curve;
+    block baseOtSeed;
+    EccNumber randomNumber;
+#endif
+#ifdef ENABLE_SIMPLESTOT_ASM
     SENDER sender;
+#endif
     std::vector<u64> keys;
     std::vector<block> recvMsgs;
     std::vector<block> recvMsgsResult;
@@ -27,7 +37,7 @@ public:
 
     // WedprKkrtReceiver() = default;
     // WedprKkrtReceiver(const WedprKkrtReceiver&) = delete;
-    WedprKkrtReceiver(u64 _choiceCount, u64 _msgCount, const std::vector<u64>& chooses)
+    WedprKkrtReceiver(u64 _choiceCount, u64 _msgCount, const std::vector<u64>& chooses): randomNumber(curve)
     {
         choiceCount = _choiceCount;
         msgCount = _msgCount;
@@ -44,13 +54,22 @@ public:
         msgsBase.resize(countBase);
         recvMsgs.resize(choiceCount);
         recvMsgsResult.resize(choiceCount);
+        EccNumber _randomNumber(curve, prng);
+        randomNumber = _randomNumber;
+
     };
 
 
     ~WedprKkrtReceiver() {}
 
+#if defined(ENABLE_SIMPLESTOT)
+    void step1InitBaseOt(std::vector<u8>& SPack);
+    void step3SetSeedPack(std::vector<u8>& RSPackResult);
+#endif
+#ifdef ENABLE_SIMPLESTOT_ASM
     void step1InitBaseOt(u8* SPack);
     void step3SetSeedPack(const u8* RSPackResult);
+#endif
     void step5InitMatrix(const block& theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT);
     void step7GetFinalResult(const Matrix<block>& sendMatrix);
     void step7GetFinalResultWithDecMessage(const Matrix<block>& sendMatrix,

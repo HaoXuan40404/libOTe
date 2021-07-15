@@ -37,11 +37,20 @@ void WedprKkrtSender::dataMessageToDecBlock()
     }
 }
 
+#if defined(ENABLE_SIMPLESTOT)
+    void WedprKkrtSender::step2ExtendSeedPack(block& baseOtSeed, std::vector<u8>& SPack, std::vector<u8>& RSPackResult) {
+        base.receiveSPack(curve, bv, msgsBase, prng, baseOtSeed, SPack, RSPackResult);
+        kkrtNcoOtSender.setBaseOts(msgsBase, bv);
+    }
+#endif
+
+#ifdef ENABLE_SIMPLESTOT_ASM
 void WedprKkrtSender::step2ExtendSeedPack(const u8* sPack, u8* rSPackResult)
 {
     base.receiveSPack(recver, bv, msgsBase, prng, sPack, rSPackResult);
     kkrtNcoOtSender.setBaseOts(msgsBase, bv);
 }
+#endif
 
 // seed maybe should use a pointer
 void WedprKkrtSender::step4GenerateSeed(block& seed, u8* comm)

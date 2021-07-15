@@ -54,11 +54,11 @@ namespace tests_libOTe
         tc.add("NcoOt_genBaseOts_Test              ", NcoOt_genBaseOts_Test);
 
         tc.add("AknOt_sendRecv1000_Test            ", AknOt_sendRecv1000_Test);
-        tc.add("Wedpr_kkrt_ot_local_test            ", Wedpr_kkrt_ot_local_test);
-        tc.add("Wedpr_kkrt_ot_choose_normal_test            ", Wedpr_kkrt_ot_choose_normal_test);
-        tc.add("wedpr_kkrt_id_test            ", wedpr_kkrt_id_test);
+        // tc.add("Wedpr_kkrt_ot_local_test            ", Wedpr_kkrt_ot_local_test);
+        // tc.add("Wedpr_kkrt_ot_choose_normal_test            ", Wedpr_kkrt_ot_choose_normal_test);
+        // tc.add("wedpr_kkrt_id_test            ", wedpr_kkrt_id_test);
         tc.add("wedpr_kkrt_aes_enc_test            ", wedpr_kkrt_aes_enc_test);
-        tc.add("wedpr_kkrt_vector_choice_test            ", wedpr_kkrt_vector_choice_test);
+        // tc.add("wedpr_kkrt_vector_choice_test            ", wedpr_kkrt_vector_choice_test);
 
     });
 

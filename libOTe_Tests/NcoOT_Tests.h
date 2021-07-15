@@ -14,9 +14,9 @@ namespace tests_libOTe
     void Tools_LinearCode_sub_Test();
     void Tools_LinearCode_rep_Test();
 
-    void Wedpr_kkrt_ot_local_test();
-    void Wedpr_kkrt_ot_choose_normal_test();
-    void wedpr_kkrt_id_test();
+    // void Wedpr_kkrt_ot_local_test();
+    // void Wedpr_kkrt_ot_choose_normal_test();
+    // void wedpr_kkrt_id_test();
     void wedpr_kkrt_aes_enc_test();
-    void wedpr_kkrt_vector_choice_test();
+    // void wedpr_kkrt_vector_choice_test();
 }

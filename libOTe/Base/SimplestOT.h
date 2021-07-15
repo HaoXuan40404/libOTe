@@ -9,6 +9,7 @@
 // #include "SimplestOT/ot_receiver.h"
 // #include "SimplestOT/ot_sender.h"
 #include "libOTe/config.h"
+#include <cryptoTools/Crypto/Curve.h>
 
 
 #include "libOTe/TwoChooseOne/OTExtInterface.h"
@@ -37,7 +38,6 @@ public:
     // If unsure leave as true as the strings will be uniform (safest but slower).
     bool mUniformOTs = true;
 
-
     void receive(
         const BitVector& choices, span<block> messages, PRNG& prng, Channel& chl, u64 numThreads)
     {
@@ -52,6 +52,13 @@ public:
     void receive(const BitVector& choices, span<block> messages, PRNG& prng, Channel& chl) override;
 
     void send(span<std::array<block, 2>> messages, PRNG& prng, Channel& chl) override;
+
+    // SIMPLEST_OT_PACK_BYTES = 32
+    void sendSPack(EllipticCurve& curve,  EccNumber&a, PRNG& prng, std::vector<u8>& S_pack, block& seed);
+
+    void receiveSPack(EllipticCurve& curve, const BitVector& choices, span<block> msg, PRNG& prng, const block& seed, std::vector<u8>& S_pack, std::vector<u8>& RS_pack_result);
+
+    void sendMessage(EllipticCurve& curve, EccNumber&a, span<std::array<block, 2>> msg, block& seed, std::vector<u8>& RS_pack_result);
 };
 
 #endif
