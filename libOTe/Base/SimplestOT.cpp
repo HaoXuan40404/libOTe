@@ -145,7 +145,7 @@ void SimplestOT::sendSPack(Curve& curve, Number&a,  PRNG& prng, std::vector<u8>&
     seed = prng.get<block>();
     // Number a(curve, prng);
     // Number a(curve);
-    std::cout << "saaaaaaa"<< a << std::endl;
+    // std::cout << "saaaaaaa"<< a << std::endl;
     // myTestA = a;
     Point A = g * a;
     std::vector<u8> buff(pointSize + mUniformOTs * sizeof(block)), hashBuff(pointSize);
@@ -170,7 +170,7 @@ void SimplestOT::sendMessage(Curve& curve, EccNumber& a, span<std::array<block, 
     // Number a(curve, prng);
     // Number a(curve);
     // Number a = myTestA;
-    std::cout << "saaaaaaa"<< a << std::endl;
+    // std::cout << "saaaaaaa"<< a << std::endl;
     Point A = g * a;
     std::vector<u8> buff(pointSize + mUniformOTs * sizeof(block)), hashBuff(pointSize);
     A.toBytes(buff.data());

@@ -1,6 +1,10 @@
 #include "Tools.h"
 #include <cryptoTools/Common/Defines.h>
 #include <cryptoTools/Common/MatrixView.h>
+#include <iostream>
+#include <ostream>
+#include <string>
+#include <vector>
 #ifndef _MSC_VER
 #include <x86intrin.h>
 #endif
@@ -36,6 +40,197 @@ u8 getBit(array<block, 128>& inOut, u64 i, u64 j)
     return temp[j];
 }
 
+std::vector<block> stringToBlockVec(const std::string& inString) {
+    int len = inString.length()/16 + 1;
+    // maybe useless
+    // std::string tmp = inString;
+    // tmp.resize(len*16);
+    std::vector<block> out;
+    for(int i = 0; i < len; i ++) {
+        out.push_back(block(inString[i*16 + 15], inString[i*16 + 14], inString[i*16 + 13],inString[i*16 + 12],inString[i*16 + 11],inString[i*16 + 10],inString[i*16 + 9],inString[i*16 + 8],inString[i*16 + 7],inString[i*16 + 6],inString[i*16 + 5],inString[i*16 + 4],inString[i*16 + 3],inString[i*16 + 2],inString[i*16 + 1],inString[i*16]));
+    }
+    return out;
+}
+
+void keyToBlockVec(const std::string& inKey, std::vector<block>& out) {
+    int keyLen = inKey.length();
+    if(keyLen%16 != 0 ){
+        std::cout<<"keyToBlockVec failed, inKey length = "<< keyLen <<std::endl;
+        out.resize(0);
+    }
+    int len = keyLen/16 + 1;
+    for(int i = 1; i < len; i ++) {
+        out[i] = block(inKey[i*16 + 15], inKey[i*16 + 14], inKey[i*16 + 13],inKey[i*16 + 12],inKey[i*16 + 11],inKey[i*16 + 10],inKey[i*16 + 9],inKey[i*16 + 8],inKey[i*16 + 7],inKey[i*16 + 6],inKey[i*16 + 5],inKey[i*16 + 4],inKey[i*16 + 3],inKey[i*16 + 2],inKey[i*16 + 1],inKey[i*16]);
+    }
+}
+
+std::string EncBlockVecToString(const std::vector<block>& blockVec) {
+        std::stringstream buffer;
+        for(int i = blockVec.size()-1; i >= 0; i--) {
+            buffer << blockVec[i];
+        }
+        std::string hex = buffer.str();
+        int len = hex.length();
+        std::string newString;
+        for(int i=len; i > 0; i-=2)
+        {
+            std::string byte = hex.substr(i,2);
+            char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
+            newString.push_back(chr);
+        }
+        return newString;
+}
+
+std::string blockVecToString(const std::vector<block>& blockVec) {
+        std::stringstream buffer;
+        for(int i = blockVec.size()-1; i >= 0; i--) {
+            buffer << blockVec[i];
+        }
+        std::string hex = buffer.str();
+        int len = hex.length();
+        std::string newString;
+        for(int i=len; i > 0; i-=2)
+        {
+            std::string byte = hex.substr(i,2);
+            if(byte == "00") {
+                break;
+            }
+            char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
+            newString.push_back(chr);
+        }
+        return newString;
+}
+
+// char* blockVecToChar(const std::vector<block>& blockVec) {
+//         std::stringstream buffer;
+//         for(int i = blockVec.size()-1; i >= 0; i--) {
+//             buffer << blockVec[i];
+//         }
+//         std::string hex = buffer.str();
+//         int len = hex.length();
+//         char newChar[len];
+//         for(int i=len; i > 0; i-=2)
+//         {
+//             std::string byte = hex.substr(i,2);
+//             if(byte == "00") {
+//                 break;
+//             }
+//             char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
+//             newChar[i] = chr;
+//         }
+//         return newChar;
+// }
+
+std::vector<u64> ToU64Vector(const block& block) {
+    std::vector<u64> array(2);
+    std::uint64_t first = block.as<std::uint64_t>()[0];
+    std::uint64_t second = block.as<std::uint64_t>()[1];
+    array[0] = first;
+    array[1] = second;
+    return array;
+}
+
+std::vector<u64> ToU64Vector(const std::vector<block>& blockArray) {
+    std::vector<u64> array;
+    for(u64 i = 0; i < blockArray.size(); i++) {
+        std::uint64_t first = blockArray[i].as<std::uint64_t>()[0];
+        std::uint64_t second = blockArray[i].as<std::uint64_t>()[1];
+        array.push_back(first);
+        array.push_back(second);
+    }
+    return array;
+}
+
+std::vector<block> ToBlockVector(const std::vector<u64>& array) {
+    std::vector<block> vec;
+    if(array.size()%2 != 0) {
+        std::cout << "ToBlock length check failed, array.size() = "<< array.size() << std::endl;
+        return vec;
+    }
+    for(u64 i = 0; i < array.size(); i+=2) {
+        u64 first = array[i];
+        u64 second = array[i+1];
+        block num = block(second, first);
+        vec.push_back(num);
+    }
+
+    return vec;
+}
+
+block ToBlock(const std::vector<u64>& array) {
+    if(array.size() != 2) {
+        std::cout << "ToBlock length check failed, array.size() = "<< array.size() << std::endl;
+        return block(0,0);
+    }
+    u64 second = array[1];
+    u64 first = array[0];
+    return block(second, first);
+}
+
+
+std::vector<u64> MatrixToU64Vector(const Matrix<block>& matrix) {
+    std::vector<u64> result;
+    for (u64 i = 0; i < matrix.rows(); ++i)
+    {
+        for (u64 j = 0; j < matrix.cols(); ++j)
+        {
+            std::uint64_t first = matrix[i][j].as<std::uint64_t>()[0];
+            std::uint64_t second = matrix[i][j].as<std::uint64_t>()[1];
+            result.push_back(first);
+            result.push_back(second);
+        }
+    }
+    return result;
+}
+
+Matrix<block> U64VectorToMatrix(const std::vector<u64>& array, u64 rows, u64 cols) {
+    Matrix<block> matrix(rows, cols);
+
+    // check this
+    for (u64 i = 0; i < rows; ++i)
+    {
+        for (u64 j = 0; j < cols; ++j)
+        {
+            u64 index = (i*cols+j)*2;
+            std::uint64_t first = array[index];
+            std::uint64_t second = array[index+1];
+            block num = block(second, first);
+            matrix[i][j] = num;
+        }
+    }
+    return matrix;
+}
+
+// std::vector<u8> blockToBytesArray(const block& block) {
+//     std::uint64_t first = block.as<std::uint64_t>()[0];
+//     std::uint64_t second = block.as<std::uint64_t>()[1];
+//     std::cout << "first = "<< first << std::endl;
+//     std::cout << "second = "<< second << std::endl;
+//     u8 *p1 = (u8 *)&first;
+//     u8 *p2 = (u8 *)&second;
+//     u64 refirst = (u64)p1;
+//     std::cout << "refirst = "<< refirst << std::endl;
+//     // std::copy(p1, p1 + 8, p3);
+//     // std::copy(p2, p2 + 8, p3 + 8);
+//     std::vector<u8> array(p1, p1+16);
+//     return array;
+
+// }
+
+// block bytesArrayToBlock(std::vector<u8>& array) {
+//     uint64_t first = 0;
+//     for(int i = 0; i < 8; ++i){
+//     first += array[i] << (56 - i*8);
+//     }
+//     uint64_t second = 0;
+//     for(int i = 0; i < 8; ++i){
+//     second += array[i+8] << (56 - i*8);
+//     }
+//     std::cout << "first = "<< first << std::endl;
+//     std::cout << "second = "<< second << std::endl;
+//     // return block(second, first);
+//     return block(second, first);
+// }
 
 void eklundh_transpose128(array<block, 128>& inOut)
 {

@@ -4,6 +4,9 @@
 
 #include <cryptoTools/Common/Defines.h>
 #include <cryptoTools/Common/MatrixView.h>
+#include <string>
+#include <vector>
+#include "cryptoTools/Common/Matrix.h"
 namespace osuCrypto
 {
 static inline void mul128(block x, block y, block& xy1, block& xy2)
@@ -76,6 +79,17 @@ void sse_transpose128x1024(std::array<std::array<block, 8>, 128>& inOut);
 #endif
 void transpose(const MatrixView<block>& in, const MatrixView<block>& out);
 void transpose(const MatrixView<u8>& in, const MatrixView<u8>& out);
+std::vector<block> stringToBlockVec(const std::string& string);
+std::string blockVecToString(const std::vector<block>& blockVec);
+std::string EncBlockVecToString(const std::vector<block>& blockVec);
+block ToBlock(const std::vector<u64>& array);
+std::vector<u64> ToU64Vector(const std::vector<block>& blockArray);
+std::vector<block> ToBlockVector(const std::vector<u64>& array);
+std::vector<u64> ToU64Vector(const block& block);
+std::vector<u64> MatrixToU64Vector(const Matrix<block>& matrix);
+Matrix<block> U64VectorToMatrix(const std::vector<u64>& array, u64 rows, u64 cols);
+// block bytesArrayToBlock(std::vector<u8>& array);
+// std::vector<u8> blockToBytesArray(const block& block);
 
 
 inline void transpose128(std::array<block, 128>& inOut)

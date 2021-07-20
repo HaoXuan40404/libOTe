@@ -45,8 +45,10 @@ void WedprKkrtReceiver::step5InitMatrix(
         // std::cout<<"recver choice = "<<choice[0]<<std::endl;
         kkrtNcoOtReceiver.encode(i, choice.data(), &recvMsgs[i]);
     }
-    // std::cout<<"kkrtNcoOtReceiver.mT1.size()* sizeof(block) = "<<kkrtNcoOtReceiver.mT1.size()*
-    // sizeof(block)<<std::endl;
+    // rows = choiceNum
+    // cols = 4
+    // std::cout<<"kkrtNcoOtReceiver.mT1.rows() = "<<kkrtNcoOtReceiver.mT1.rows() <<std::endl;
+    // std::cout<<"kkrtNcoOtReceiver.mT1.cols() = "<<kkrtNcoOtReceiver.mT1.cols() <<std::endl;
     mT.resize(kkrtNcoOtReceiver.mT1.rows(), kkrtNcoOtReceiver.mT1.cols());
     memcpy(mT.data(), kkrtNcoOtReceiver.mT1.data(), kkrtNcoOtReceiver.mT1.size() * sizeof(block));
 }
