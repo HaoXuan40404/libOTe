@@ -40,17 +40,16 @@ u8 getBit(array<block, 128>& inOut, u64 i, u64 j)
     return temp[j];
 }
 
-std::vector<block> stringToBlockVec(std::string& inString) {
-    int paddingLen = inString.length()%16;
-    // maybe useless
+std::vector<block> stringToBlockVec(std::string* inString) {
+    int paddingLen = inString->length()%16;
     if(paddingLen!=0) {
-        inString.append(paddingLen,  char(00));
+        inString->append(16 - paddingLen,  char(00));
     }
-
+    int iterSize = inString->length()/16;
     std::vector<block> out;
-    for(u64 i = 0; i < inString.length(); i++) {
-        out.push_back(block(inString[i*16 + 15], inString[i*16 + 14], inString[i*16 + 13],inString[i*16 + 12],inString[i*16 + 11],inString[i*16 + 10],inString[i*16 + 9],inString[i*16 + 8],inString[i*16 + 7],inString[i*16 + 6],inString[i*16 + 5],inString[i*16 + 4],inString[i*16 + 3],inString[i*16 + 2],inString[i*16 + 1],inString[i*16]));
-        // out.push_back(block(tmp[i*16 + 15], tmp[i*16 + 14], tmp[i*16 + 13],tmp[i*16 + 12],tmp[i*16 + 11],tmp[i*16 + 10],tmp[i*16 + 9],tmp[i*16 + 8],tmp[i*16 + 7],tmp[i*16 + 6],tmp[i*16 + 5],tmp[i*16 + 4],tmp[i*16 + 3],tmp[i*16 + 2],tmp[i*16 + 1],tmp[i*16]));
+    for(int i = 0; i < iterSize; i++) {
+        // out.push_back(block(inString->at(i*16 + 15), *inString[i*16 + 14], inString[i*16 + 13],inString[i*16 + 12],inString[i*16 + 11],inString[i*16 + 10],inString[i*16 + 9],inString[i*16 + 8],inString[i*16 + 7],inString[i*16 + 6],inString[i*16 + 5],inString[i*16 + 4],inString[i*16 + 3],inString[i*16 + 2],inString[i*16 + 1],inString[i*16]));
+        out.push_back(block(inString->at(i*16 + 15), inString->at(i*16 + 14), inString->at(i*16 + 13),inString->at(i*16 + 12),inString->at(i*16 + 11),inString->at(i*16 + 10),inString->at(i*16 + 9),inString->at(i*16 + 8),inString->at(i*16 + 7),inString->at(i*16 + 6),inString->at(i*16 + 5),inString->at(i*16 + 4),inString->at(i*16 + 3),inString->at(i*16 + 2),inString->at(i*16 + 1),inString->at(i*16)));
     }
     return out;
 }

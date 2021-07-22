@@ -1437,7 +1437,7 @@ void wedpr_kkrt_aes_enc_point_cast_test()
         // we test true message block length is 2
         // std::vector<block> tmp;
         std::string input = "test message index " + std::to_string(i);
-        dataMessage[i] = stringToBlockVec(input);
+        dataMessage[i] = stringToBlockVec(&input);
         // dataMessage[i] = tmp;
         std::cout << "dataMessage[" << i << "][0]=" << dataMessage[i][0] << std::endl;
         std::cout << "dataMessage[" << i << "][1]=" << dataMessage[i][1] << std::endl;

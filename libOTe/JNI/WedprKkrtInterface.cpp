@@ -55,7 +55,7 @@ JNIEXPORT jlong Java_com_webank_wedpr_ot_kkrt_NativeInterface_newSender(JNIEnv* 
         std::string dataString = env->GetStringUTFChars(
             (jstring)env->GetObjectArrayElement(dataMessageStringObj, (jsize)i), JNI_FALSE);
         std::vector<osuCrypto::block> dataBlockEach;
-        dataBlockEach = osuCrypto::stringToBlockVec(dataString);
+        dataBlockEach = osuCrypto::stringToBlockVec(&dataString);
         dataBlock.push_back(dataBlockEach);
     }
 
