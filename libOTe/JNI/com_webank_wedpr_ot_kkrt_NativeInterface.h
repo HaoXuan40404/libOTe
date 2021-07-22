@@ -17,10 +17,18 @@ JNIEXPORT jlong JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_newSender
 
 /*
  * Class:     com_webank_wedpr_ot_kkrt_NativeInterface
- * Method:    getSenderEncMessage
+ * Method:    deleteSender
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_deleteSender
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_webank_wedpr_ot_kkrt_NativeInterface
+ * Method:    getSenderEncryptedMessage
  * Signature: (J[[J[[B)V
  */
-JNIEXPORT void JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_getSenderEncMessage
+JNIEXPORT void JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_getSenderEncryptedMessage
   (JNIEnv *, jclass, jlong, jobjectArray, jobjectArray);
 
 /*
@@ -30,6 +38,14 @@ JNIEXPORT void JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_getSenderEn
  */
 JNIEXPORT jlong JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_newReceiver
   (JNIEnv *, jclass, jlong, jlong, jlongArray);
+
+/*
+ * Class:     com_webank_wedpr_ot_kkrt_NativeInterface
+ * Method:    deleteReceiver
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_webank_wedpr_ot_kkrt_NativeInterface_deleteReceiver
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     com_webank_wedpr_ot_kkrt_NativeInterface

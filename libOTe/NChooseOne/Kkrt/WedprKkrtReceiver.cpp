@@ -3,19 +3,23 @@
 #include <cryptoTools/Common/Defines.h>
 #include <cryptoTools/Crypto/AES.h>
 #include <cryptoTools/Crypto/RandomOracle.h>
+#include <iostream>
+#include <ostream>
 
 namespace osuCrypto
 {
 using namespace std;
 #if defined(ENABLE_SIMPLESTOT)
-void WedprKkrtReceiver::step1InitBaseOt(std::vector<u8>& SPack) {
-    base.sendSPack(curve, randomNumber,prng, SPack, baseOtSeed);
-
+void WedprKkrtReceiver::step1InitBaseOt(std::vector<u8>& SPack)
+{
+    base.sendSPack(curve, randomNumber, prng, SPack, baseOtSeed);
 }
-    void WedprKkrtReceiver::step3SetSeedPack(std::vector<u8>& RSPackResult) {
-        base.sendMessage(curve, randomNumber, msgsBase, baseOtSeed, RSPackResult);
-        kkrtNcoOtReceiver.setBaseOts(msgsBase);
-    }
+
+void WedprKkrtReceiver::step3SetSeedPack(std::vector<u8>& RSPackResult)
+{
+    base.sendMessage(curve, randomNumber, msgsBase, baseOtSeed, RSPackResult);
+    kkrtNcoOtReceiver.setBaseOts(msgsBase);
+}
 #endif
 
 #ifdef ENABLE_SIMPLESTOT_ASM
@@ -40,15 +44,11 @@ void WedprKkrtReceiver::step5InitMatrix(
     for (u64 i = 0; i < recvMsgs.size(); ++i)
     {
         // recver.mCorrectionIdx
-        // std::cout<<"i = "<<i<<std::endl;
         choice[0] = keys[i];
-        // std::cout<<"recver choice = "<<choice[0]<<std::endl;
         kkrtNcoOtReceiver.encode(i, choice.data(), &recvMsgs[i]);
     }
     // rows = choiceNum
     // cols = 4
-    // std::cout<<"kkrtNcoOtReceiver.mT1.rows() = "<<kkrtNcoOtReceiver.mT1.rows() <<std::endl;
-    // std::cout<<"kkrtNcoOtReceiver.mT1.cols() = "<<kkrtNcoOtReceiver.mT1.cols() <<std::endl;
     mT.resize(kkrtNcoOtReceiver.mT1.rows(), kkrtNcoOtReceiver.mT1.cols());
     memcpy(mT.data(), kkrtNcoOtReceiver.mT1.data(), kkrtNcoOtReceiver.mT1.size() * sizeof(block));
 }
@@ -66,15 +66,17 @@ void WedprKkrtReceiver::step7GetFinalResult(const Matrix<block>& sendMatrix)
 }
 
 void WedprKkrtReceiver::step7GetFinalResultWithDecMessage(const Matrix<block>& sendMatrix,
-    std::vector<std::vector<block>> enMessage, std::vector<std::vector<u8>> hash)
+    std::vector<std::vector<block>>& enMessage, std::vector<std::vector<u8>>& hash)
 {
     dataMessage.resize(choiceCount);
+    // std::cout << "recvMsgs.size();" << recvMsgs.size() << std::endl;
     for (u64 i = 0; i < recvMsgs.size(); ++i)
     {
-        bool opt = true;
-        std::cout << "key = " << keys[i] << std::endl;
-
-        for (u64 j = 0; j < sendMatrix.cols() && opt; ++j)
+        // std::cout << "recvMsgs.size() i" << i << std::endl;
+        // bool opt = true;
+        // std::cout << "sendMatrix.cols()" << sendMatrix.cols() << std::endl;
+        // std::cout << "sendMatrix.rows()" << sendMatrix.rows() << std::endl;
+        for (u64 j = 0; j < sendMatrix.cols(); ++j)
         {
             recvMsgsResult[i] = recvMsgs[i] ^ sendMatrix(i, j);
             // ot message hash
@@ -84,26 +86,22 @@ void WedprKkrtReceiver::step7GetFinalResultWithDecMessage(const Matrix<block>& s
             sha.Final(keyHash);
             std::vector<u8> temp(keyHash, keyHash + RandomOracle::HashSize);
 
-            for (u64 k = 0; k < msgCount; ++k)
+            if (temp == hash[j])
             {
-                if (temp == hash[j])
+                // decrypt message
+                details::AESDec<details::AESTypes::NI> encKey(recvMsgsResult[i]);
+                u64 length = enMessage[j].size();
+                std::vector<block> data(length);
+                // enMessage[i].resize(length);
+                for (u64 m = 0; m < length; m++)
                 {
-                    // decrypt message
-                    details::AESDec<details::AESTypes::NI> encKey(recvMsgsResult[i]);
-                    u64 length = enMessage[j].size();
-                    std::vector<block> data(length);
-                    // enMessage[i].resize(length);
-                    for (u64 m = 0; m < length; m++)
-                    {
-                        encKey.ecbDecBlock(enMessage[j][m], data[m]);
-                        std::cout << "i=" << i << "j=" << j << "k=" << k << "m=" << m
-                                  << "data[m] = " << data[m] << std::endl;
-                    }
-                    dataMessage[i] = data;
-                    opt = false;
-                    break;
+                    encKey.ecbDecBlock(enMessage[j][m], data[m]);
                 }
+                dataMessage[i] = data;
+                // opt = false;
+                break;
             }
+            // }
         }
     }
 }

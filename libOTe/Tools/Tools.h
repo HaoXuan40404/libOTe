@@ -79,9 +79,8 @@ void sse_transpose128x1024(std::array<std::array<block, 8>, 128>& inOut);
 #endif
 void transpose(const MatrixView<block>& in, const MatrixView<block>& out);
 void transpose(const MatrixView<u8>& in, const MatrixView<u8>& out);
-std::vector<block> stringToBlockVec(const std::string& string);
+std::vector<block> stringToBlockVec(std::string& string);
 std::string blockVecToString(const std::vector<block>& blockVec);
-std::string EncBlockVecToString(const std::vector<block>& blockVec);
 block ToBlock(const std::vector<u64>& array);
 std::vector<u64> ToU64Vector(const std::vector<block>& blockArray);
 std::vector<block> ToBlockVector(const std::vector<u64>& array);

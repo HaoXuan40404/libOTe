@@ -73,7 +73,7 @@ public:
     void step5InitMatrix(const block& theirSeed, const u8* comm, block& MySeed, Matrix<block>& mT);
     void step7GetFinalResult(const Matrix<block>& sendMatrix);
     void step7GetFinalResultWithDecMessage(const Matrix<block>& sendMatrix,
-        std::vector<std::vector<block>> enMessage, std::vector<std::vector<u8>> hash);
+        std::vector<std::vector<block>>& enMessage, std::vector<std::vector<u8>>& hash);
     void step7GetFinalResultWithChoice(
         const Matrix<block>& sendMatrix, const std::vector<block>& optChoice);
 };
