@@ -37,7 +37,9 @@ public:
 
     // WedprKkrtReceiver() = default;
     // WedprKkrtReceiver(const WedprKkrtReceiver&) = delete;
-    WedprKkrtReceiver(u64 _choiceCount, u64 _msgCount, const std::vector<u64>& chooses): randomNumber(curve)
+
+    // WedprKkrtReceiver(u64 _choiceCount, u64 _msgCount, const std::vector<u64>& chooses): randomNumber(curve)
+    WedprKkrtReceiver(u64 _choiceCount, u64 _msgCount, const std::vector<u64>& chooses)
     {
         choiceCount = _choiceCount;
         msgCount = _msgCount;
@@ -54,9 +56,10 @@ public:
         msgsBase.resize(countBase);
         recvMsgs.resize(choiceCount);
         recvMsgsResult.resize(choiceCount);
+#if defined(ENABLE_SIMPLESTOT)
         EccNumber _randomNumber(curve, prng);
         randomNumber = _randomNumber;
-
+#endif
     };
 
 

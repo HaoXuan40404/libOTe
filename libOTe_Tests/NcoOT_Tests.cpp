@@ -1501,19 +1501,19 @@ void wedpr_kkrt_aes_enc_point_cast_test()
 #ifdef ENABLE_SIMPLESTOT_ASM
     u8 senderPackSeed[SIMPLEST_OT_PACK_BYTES];
     std::cout << "recver.step1InitBaseOt" << std::endl;
-    recver.step1InitBaseOt(senderPackSeed);
+    recver->step1InitBaseOt(senderPackSeed);
 
     // step2: sender generate receiverPack by senderPackSeed
     // sender::receiverPack ==> recver
     u8 receiverPack[4 * SIMPLEST_OT_PACK_BYTES * 512];
     std::cout << "sender.step2ExtendSeedPack" << std::endl;
-    sender.step2ExtendSeedPack(senderPackSeed, receiverPack);
+    sender->step2ExtendSeedPack(senderPackSeed, receiverPack);
 
     // step3: recver set receiverPack
     // sender::receiverPack
     std::cout << "recver.step3SetSeedPack" << std::endl;
     // Base OT so extract step2 individual
-    recver.step3SetSeedPack(receiverPack);
+    recver->step3SetSeedPack(receiverPack);
 #endif
 
     // encode block

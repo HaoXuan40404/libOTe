@@ -250,7 +250,7 @@ void wedpr_NChooseOne_example(
     IOService ios;
     Session ep0(ios, ip, rr);
     PRNG prng(sysRandomSeed());
-    std::cout << prng.get_block() << std::endl;
+    // std::cout << prng.get_block() << std::endl;
     if (role == Role::Sender)
     {
         std::cout << "Sender" << std::endl;
