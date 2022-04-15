@@ -20,4 +20,5 @@ namespace tests_libOTe
     void wedpr_kkrt_aes_enc_test();
     void wedpr_kkrt_vector_choice_test();
     void wedpr_kkrt_aes_enc_point_cast_test();
+    void wedpr_kkrt_aes_enc_read_file_test();
 }

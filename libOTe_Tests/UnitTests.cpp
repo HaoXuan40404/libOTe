@@ -60,6 +60,7 @@ namespace tests_libOTe
         tc.add("wedpr_kkrt_aes_enc_test            ", wedpr_kkrt_aes_enc_test);
         tc.add("wedpr_kkrt_vector_choice_test            ", wedpr_kkrt_vector_choice_test);
         tc.add("wedpr_kkrt_aes_enc_point_cast_test            ", wedpr_kkrt_aes_enc_point_cast_test);
+        tc.add("wedpr_kkrt_aes_enc_read_file_test            ", wedpr_kkrt_aes_enc_read_file_test);
 
     });
 
